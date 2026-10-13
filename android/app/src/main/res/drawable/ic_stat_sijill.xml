@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Notification icon: a rolled scroll, white on transparent (Android tints it). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M6,3.5h11.5a2.5,2.5 0,0 1,2.5 2.5v0.5h-3v12.5a2.5,2.5 0,0 1,-2.5 2.5H6.5A2.5,2.5 0,0 1,4 18.5V18h10v0.5a1,1 0,0 0,2 0V6A2.5,2.5 0,0 0,13.5 3.5ZM7.5,8.5h6v1.5h-6zM7.5,12h6v1.5h-6z"/>
+</vector>

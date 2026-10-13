@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">سِجِلّ</string>
+    <string name="title_activity_main">سِجِلّ</string>
+    <string name="package_name">app.sijill.notes</string>
+    <string name="custom_url_scheme">app.sijill.notes</string>
+</resources>

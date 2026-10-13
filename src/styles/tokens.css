@@ -1,0 +1,122 @@
+/* سِجِلّ — design tokens. "Ink on paper": black, white and greys first; colour is optional.
+   Every text/background pair here is checked for 7:1 contrast by scripts/contrast.js. */
+
+@font-face { font-family: 'Sijill Sans'; src: url('/fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Sijill Sans'; src: url('/fonts/ibm-plex-sans-arabic-arabic-600-normal.woff2') format('woff2'); font-weight: 600; font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Sijill Sans'; src: url('/fonts/ibm-plex-sans-arabic-arabic-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Sijill Sans'; src: url('/fonts/ibm-plex-sans-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Sijill Sans'; src: url('/fonts/ibm-plex-sans-latin-600-normal.woff2') format('woff2'); font-weight: 600; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Sijill Sans'; src: url('/fonts/ibm-plex-sans-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+@font-face { font-family: 'Sijill Naskh'; src: url('/fonts/noto-naskh-arabic-arabic-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Sijill Naskh'; src: url('/fonts/noto-naskh-arabic-arabic-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Sijill Naskh'; src: url('/fonts/noto-serif-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Sijill Naskh'; src: url('/fonts/noto-serif-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+@font-face { font-family: 'Sijill Amiri'; src: url('/fonts/amiri-arabic-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Sijill Amiri'; src: url('/fonts/amiri-arabic-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Sijill Amiri'; src: url('/fonts/amiri-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; unicode-range: U+0000-00FF, U+2000-206F; }
+@font-face { font-family: 'Sijill Amiri'; src: url('/fonts/amiri-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; unicode-range: U+0000-00FF, U+2000-206F; }
+
+:root {
+  --font-ui: 'Sijill Sans', system-ui, sans-serif;
+  --font-read: 'Sijill Naskh', 'Sijill Sans', serif;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --tap: max(48px, 3rem);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+
+  /* Light: paper */
+  --bg: #f3f2ee;
+  --surface: #fbfaf7;
+  --raised: #ffffff;
+  --line: #d6d4cc;
+  --line-strong: #85837c;
+  --ink: #161513;
+  --ink-2: #47453f;
+  --on-ink: #fbfaf7;
+  --hover: rgba(22, 21, 19, .06);
+  --scrim: rgba(22, 21, 19, .42);
+
+  /* Accent-dependent roles; "no accent" values below. */
+  --primary: var(--ink);          /* the main button */
+  --on-primary: var(--on-ink);
+  --sel: #dedcd4;                 /* selected / current place (always paired with a shape cue) */
+  --on-sel: var(--ink);
+  --link: var(--ink);
+  --mark: #cdcac1;                /* search match (always underlined too) */
+  --on-mark: var(--ink);
+  --focus: var(--ink);
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #1a1a1c;
+  --surface: #222225;
+  --raised: #2a2a2e;
+  --line: #3b3b40;
+  --line-strong: #7b7a80;
+  --ink: #e8e5de;
+  --ink-2: #bdb9b1;
+  --on-ink: #1a1a1c;
+  --hover: rgba(232, 229, 222, .07);
+  --scrim: rgba(0, 0, 0, .55);
+  --sel: #45454b;
+  --mark: #c9c6bf;
+  --on-mark: #121212;
+  color-scheme: dark;
+}
+
+:root[data-theme='black'] {
+  --bg: #000000;
+  --surface: #0e0e0f;
+  --raised: #19191b;
+  --line: #2c2c30;
+  --line-strong: #706f75;
+  --ink: #e0ddd6;
+  --ink-2: #b4b0a8;
+  --on-ink: #000000;
+  --hover: rgba(224, 221, 214, .08);
+  --scrim: rgba(0, 0, 0, .7);
+  --sel: #38383d;
+  --mark: #c4c1ba;
+  --on-mark: #0a0a0a;
+  color-scheme: dark;
+}
+
+/* Accents (from scripts/palette.js). Chosen by brightness so they still stand out in grayscale. */
+:root[data-accent='blue']    { --a-fill: #7aacf5; --a-ink: #0f4996; --a-mark: #b3d1fd; }
+:root[data-accent='teal']    { --a-fill: #1ebdb6; --a-ink: #0d5450; --a-mark: #8bddd7; }
+:root[data-accent='saffron'] { --a-fill: #da9f4e; --a-ink: #684408; --a-mark: #f0c895; }
+:root[data-accent='red']     { --a-fill: #f18f87; --a-ink: #8d2425; --a-mark: #ffbfb9; }
+:root:is([data-theme='dark'], [data-theme='black'])[data-accent='blue']    { --a-ink: #86b7fe; --a-mark: #a0c6fe; }
+:root:is([data-theme='dark'], [data-theme='black'])[data-accent='teal']    { --a-ink: #34c9c1; --a-mark: #76d4cd; }
+:root:is([data-theme='dark'], [data-theme='black'])[data-accent='saffron'] { --a-ink: #e6aa5a; --a-mark: #eabc83; }
+:root:is([data-theme='dark'], [data-theme='black'])[data-accent='red']     { --a-ink: #fd9a92; --a-mark: #fcb1aa; }
+
+:root:not([data-accent='none'])[data-accent] {
+  --primary: var(--a-fill);
+  --on-primary: #121212;
+  --sel: var(--a-fill);
+  --on-sel: #121212;
+  --link: var(--a-ink);
+  --mark: var(--a-mark);
+  --on-mark: #121212;
+  --focus: var(--a-ink);
+}
+
+/* Marker tints: only when an accent is on, and only on the marker shape itself. */
+:root:not([data-accent='none'])[data-accent] {
+  --m-circle: #b3261e; --m-triangle: #a1520a; --m-square: #7a6400; --m-diamond: #2e6b1f;
+  --m-hexagon: #0d6660; --m-star: #1f5bb0; --m-plus: #0e4a7a; --m-ring: #6a3fa0;
+  --m-half: #a3336f; --m-down: #6b4a2e; --m-bar: #55555a;
+}
+:root:is([data-theme='dark'], [data-theme='black']):not([data-accent='none'])[data-accent] {
+  --m-circle: #ff9e94; --m-triangle: #ffb36b; --m-square: #e6cf5a; --m-diamond: #8fd27a;
+  --m-hexagon: #5fd1c7; --m-star: #8fb8ff; --m-plus: #7fc3f0; --m-ring: #c7a6ff;
+  --m-half: #ff9ccf; --m-down: #d6b08e; --m-bar: #b8b8bd;
+}
+
+/* Reading font choice (Settings → Advanced). */
+:root[data-read='amiri'] { --font-read: 'Sijill Amiri', 'Sijill Sans', serif; }

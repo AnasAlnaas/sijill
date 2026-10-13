@@ -1,0 +1,14 @@
+{
+  "appId": "app.sijill.notes",
+  "appName": "سِجِلّ",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "css",
+      "initialViewportFitValueHint": "cover"
+    }
+  }
+}

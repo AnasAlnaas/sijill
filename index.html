@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light" data-accent="none">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="color-scheme" content="light dark">
+  <title>سِجِلّ</title>
+  <script>
+    // Apply the saved look before anything paints, so there's no flash of the wrong theme.
+    try {
+      var b = JSON.parse(localStorage.getItem('sijill.boot') || '{}');
+      var r = document.documentElement;
+      var theme = b.theme || 'system';
+      if (theme === 'system') theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      r.dataset.theme = theme;
+      r.dataset.accent = b.accent || 'none';
+      r.lang = b.lang || 'ar';
+      r.dir = (b.lang || 'ar') === 'ar' ? 'rtl' : 'ltr';
+      if (b.fontPx) r.style.fontSize = b.fontPx + 'px';
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="/src/styles/tokens.css">
+  <link rel="stylesheet" href="/src/styles/app.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
