@@ -141,7 +141,6 @@ mark { background: var(--mark); color: var(--on-mark); text-decoration: underlin
   background: var(--bg);
   border-block-start: 1px solid var(--line);
 }
-:root[dir='rtl'] .bottombar { padding-inline: calc(.625rem + var(--sar)) calc(.625rem + var(--sal)); }
 .search-pill {
   flex: 1; min-inline-size: 0;
   min-block-size: var(--tap);
@@ -305,6 +304,7 @@ mark { background: var(--mark); color: var(--on-mark); text-decoration: underlin
 
 .seg { display: flex; flex-wrap: wrap; gap: .375rem; }
 .seg button {
+  flex: 1 1 auto; justify-content: center;
   min-block-size: var(--tap); padding-inline: .9rem;
   border: 1.5px solid var(--line-strong); border-radius: 10px;
   display: inline-flex; align-items: center; gap: .35rem; font-size: .9375rem;
@@ -342,7 +342,7 @@ mark { background: var(--mark); color: var(--on-mark); text-decoration: underlin
 .set-row .help { color: var(--ink-2); font-size: .875rem; margin: 0; }
 .set-row.inline { grid-template-columns: 1fr auto; align-items: center; }
 .set-row ol { margin: 0; padding-inline-start: 1.25rem; font-size: .9375rem; display: grid; gap: .35rem; }
-.set-row .btns { display: flex; flex-wrap: wrap; gap: .5rem; }
+.set-row .btns { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: flex-end; }
 .swatches { display: grid; gap: .4rem; }
 .swatch { display: flex; align-items: center; gap: .75rem; min-block-size: var(--tap); padding-inline: .6rem; border: 1.5px solid var(--line); border-radius: 10px; text-align: start; }
 .swatch .dot { inline-size: 1.75rem; block-size: 1.75rem; border-radius: 50%; border: 1.5px solid var(--ink); flex: none; }
@@ -408,3 +408,20 @@ input[type='range'] { inline-size: 100%; accent-color: var(--ink); min-block-siz
 
 /* Writing areas show the caret, not a focus ring. */
 .ed-title:focus-visible, .ed-body:focus-visible, .cl-text:focus-visible, .search-pill input:focus-visible { outline: none; }
+
+/* --- one-handed use --------------------------------------------------------------------------
+   Bars and action rows are laid out toward the thumb (right by default; Settings → Advanced),
+   whatever the reading direction: the last item in each sits under the thumb. Their contents
+   keep the language's own direction. */
+:root[data-hand='right'] :is(.bottombar, .editor-bar, .sheet-actions, .toast, .switch-row, .set-row .btns, .set-row.inline) { direction: ltr; }
+:root[data-hand='left'] :is(.bottombar, .editor-bar, .sheet-actions, .toast, .switch-row, .set-row .btns, .set-row.inline) { direction: rtl; }
+:root[dir='rtl'] :is(.bottombar, .editor-bar, .sheet-actions, .toast, .switch-row, .set-row .btns, .set-row.inline) > * { direction: rtl; }
+:root[dir='ltr'] :is(.bottombar, .editor-bar, .sheet-actions, .toast, .switch-row, .set-row .btns, .set-row.inline) > * { direction: ltr; }
+
+.switch-row {
+  display: flex; align-items: center; gap: 1rem;
+  inline-size: 100%; text-align: start;
+  min-block-size: calc(var(--tap) + .5rem);
+}
+.switch-row .switch-text { flex: 1; display: grid; gap: .35rem; }
+.switch-row:active { background: var(--hover); }

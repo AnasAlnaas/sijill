@@ -210,23 +210,23 @@ class Editor {
     if (!n) return;
     if (this.readOnly) {
       fill(this.barEl,
-        h('button', { class: 'btn quiet', onclick: () => { actions.restoreNotes([this.id]); this.readOnly = false; this.close({ silent: true }); } }, icon('restore'), t('restore')),
+        h('button', { class: 'btn quiet', onclick: async () => { if (await actions.deleteForever([this.id])) this.close({ silent: true }); } }, icon('trash'), t('deleteForever')),
         h('span', { class: 'spacer' }),
-        h('button', { class: 'btn quiet', onclick: async () => { if (await actions.deleteForever([this.id])) this.close({ silent: true }); } }, icon('trash'), t('deleteForever')));
+        h('button', { class: 'btn quiet', onclick: () => { actions.restoreNotes([this.id]); this.readOnly = false; this.close({ silent: true }); } }, icon('restore'), t('restore')));
       return;
     }
     const itemTools = this.checklist && this.focusedItem
       ? [
         h('button', { class: 'icon-btn', 'aria-label': t('outdent'), onpointerdown: (e) => e.preventDefault(), onclick: () => this.checklist.indent(this.focusedItem, 0) }, icon('outdent')),
         h('button', { class: 'icon-btn', 'aria-label': t('indent'), onpointerdown: (e) => e.preventDefault(), onclick: () => this.checklist.indent(this.focusedItem, 1) }, icon('indent')),
-        h('span', { class: 'spacer' }),
       ]
       : [];
+    // The bar is laid out from the far side toward the thumb (see .editor-bar in app.css):
+    // "more" is furthest away, the most-used actions sit right under the thumb.
     fill(this.barEl,
+      h('button', { class: 'icon-btn', 'aria-label': t('more'), onclick: () => this.more() }, icon('more')),
+      h('span', { class: 'spacer' }),
       ...itemTools,
-      h('button', { class: 'icon-btn', 'aria-label': `${t('marker')}: ${markerName(n.marker)}`, onclick: () => this.pickMarker() }, n.marker ? markerIcon(n.marker, { size: 22 }) : icon('marker')),
-      h('button', { class: 'icon-btn', 'aria-label': t('labels'), onclick: () => this.pickLabels() }, icon('label')),
-      h('button', { class: 'icon-btn', 'aria-label': t('reminder'), 'aria-pressed': n.reminder ? 'true' : 'false', onclick: () => this.pickReminder() }, icon(n.reminder ? 'bellAlert' : 'bell')),
       h('button', {
         class: 'icon-btn', 'aria-label': n.pinned ? t('unpin') : t('pin'), 'aria-pressed': String(n.pinned),
         onclick: () => {
@@ -234,8 +234,9 @@ class Editor {
           this.renderBar();
         },
       }, icon(n.pinned ? 'pinFilled' : 'pin')),
-      itemTools.length ? null : h('span', { class: 'spacer' }),
-      h('button', { class: 'icon-btn', 'aria-label': t('more'), onclick: () => this.more() }, icon('more')));
+      h('button', { class: 'icon-btn', 'aria-label': `${t('marker')}: ${markerName(n.marker)}`, onclick: () => this.pickMarker() }, n.marker ? markerIcon(n.marker, { size: 22 }) : icon('marker')),
+      h('button', { class: 'icon-btn', 'aria-label': t('labels'), onclick: () => this.pickLabels() }, icon('label')),
+      h('button', { class: 'icon-btn', 'aria-label': t('reminder'), 'aria-pressed': n.reminder ? 'true' : 'false', onclick: () => this.pickReminder() }, icon(n.reminder ? 'bellAlert' : 'bell')));
   }
 
   pickMarker() {

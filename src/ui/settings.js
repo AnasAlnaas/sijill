@@ -53,7 +53,7 @@ export function openSettings() {
 
 function set(key, value) {
   store.set(key, value);
-  if (['lang', 'theme', 'accent', 'textScale', 'numerals', 'calendar', 'readingFont'].includes(key)) {
+  if (['lang', 'theme', 'accent', 'textScale', 'numerals', 'calendar', 'readingFont', 'hand'].includes(key)) {
     applyAppearance(store.settings);
     rerender();
   }
@@ -75,10 +75,11 @@ function seg(options, value, onPick, label) {
     }, icon('check', { size: 18 }), text)));
 }
 
+// The whole row is the switch, so it can be tapped anywhere; the switch itself sits on the thumb side.
 function switchRow(label, on, onToggle, help) {
-  const sw = h('button', { class: 'switch-hit', role: 'switch', 'aria-checked': String(on), 'aria-label': label, onclick: () => onToggle(!on) },
-    h('span', { class: 'switch', 'aria-checked': String(on) }));
-  return h('div', { class: 'set-row inline' }, h('div', null, h('div', { class: 'label' }, label), help ? h('p', { class: 'help' }, help) : null), sw);
+  return h('button', { class: 'set-row switch-row', role: 'switch', 'aria-checked': String(on), onclick: () => onToggle(!on) },
+    h('span', { class: 'switch-text' }, h('span', { class: 'label' }, label), help ? h('span', { class: 'help' }, help) : null),
+    h('span', { class: 'switch', 'aria-hidden': 'true', 'aria-checked': String(on) }));
 }
 
 const ACCENTS = [
@@ -201,6 +202,7 @@ async function build() {
       h('button', { class: 'btn', onclick: () => keepImport() }, icon('inbox'), t('importKeep'))), t('importKeepHelp')));
 
   const advanced = group(t('advanced'),
+    row(t('hand'), seg([['right', t('handRight')], ['left', t('handLeft')]], s.hand || 'right', (v) => set('hand', v), t('hand')), t('handHelp')),
     row(t('readingFont'), seg([['naskh', t('fontNaskh')], ['amiri', t('fontAmiri')]], s.readingFont || 'naskh', (v) => set('readingFont', v), t('readingFont')),
       h('span', { class: 'sample', style: { display: 'block' } }, t('sample'))),
     h('div', { class: 'set-row' },

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-theme="light" data-accent="none">
+<html lang="ar" dir="rtl" data-theme="light" data-accent="none" data-hand="right">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
@@ -14,6 +14,7 @@
       if (theme === 'system') theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       r.dataset.theme = theme;
       r.dataset.accent = b.accent || 'none';
+      r.dataset.hand = b.hand === 'left' ? 'left' : 'right';
       r.lang = b.lang || 'ar';
       r.dir = (b.lang || 'ar') === 'ar' ? 'rtl' : 'ltr';
       if (b.fontPx) r.style.fontSize = b.fontPx + 'px';

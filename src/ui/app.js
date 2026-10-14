@@ -326,13 +326,10 @@ function renderSelectionBar() {
     h('span', { class: 'count', 'aria-live': 'polite' }, t('selected', { n: ids.length })),
     inTrash
       ? [
-        h('button', { class: 'icon-btn', 'aria-label': t('restore'), onclick: done(actions.restoreNotes) }, icon('restore')),
         h('button', { class: 'icon-btn', 'aria-label': t('deleteForever'), onclick: async () => { if (await actions.deleteForever(ids)) clearSelection(); } }, icon('trash')),
+        h('button', { class: 'icon-btn', 'aria-label': t('restore'), onclick: done(actions.restoreNotes) }, icon('restore')),
       ]
       : [
-        h('button', { class: 'icon-btn', 'aria-label': allPinned ? t('unpin') : t('pin'), onclick: done((x) => actions.setPinned(x, !allPinned)) }, icon(allPinned ? 'pinFilled' : 'pin')),
-        h('button', { class: 'icon-btn', 'aria-label': allArchived ? t('unarchive') : t('doArchive'), onclick: done(allArchived ? actions.unarchiveNotes : actions.archiveNotes) }, icon(allArchived ? 'unarchive' : 'archive')),
-        h('button', { class: 'icon-btn', 'aria-label': t('moveToTrash'), onclick: done(actions.trashNotes) }, icon('trash')),
         h('button', {
           class: 'icon-btn', 'aria-label': t('more'),
           onclick: () => menuSheet(null, [
@@ -354,5 +351,9 @@ function renderSelectionBar() {
             },
           ]),
         }, icon('more')),
+        // Nearest the thumb: the everyday actions. Trash sits one step further away.
+        h('button', { class: 'icon-btn', 'aria-label': t('moveToTrash'), onclick: done(actions.trashNotes) }, icon('trash')),
+        h('button', { class: 'icon-btn', 'aria-label': allPinned ? t('unpin') : t('pin'), onclick: done((x) => actions.setPinned(x, !allPinned)) }, icon(allPinned ? 'pinFilled' : 'pin')),
+        h('button', { class: 'icon-btn', 'aria-label': allArchived ? t('unarchive') : t('doArchive'), onclick: done(allArchived ? actions.unarchiveNotes : actions.archiveNotes) }, icon(allArchived ? 'unarchive' : 'archive')),
       ]);
 }
