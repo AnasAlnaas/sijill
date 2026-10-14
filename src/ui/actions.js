@@ -4,6 +4,7 @@
 import { store } from '../state.js';
 import { t } from '../i18n.js';
 import { toast, confirmDialog } from './overlays.js';
+import { date } from '../core/format.js';
 
 function snapshot(ids, fields) {
   return ids.map((id) => store.get(id)).filter(Boolean)
@@ -61,4 +62,14 @@ export function setMarker(ids, marker) {
   const snaps = snapshot(ids, ['marker']);
   store.updateNotes(ids, () => ({ marker }), { touch: false });
   return undoFor(snaps);
+}
+
+/** "Delete after a month" (on) or "keep forever" (off). The note moves to Trash a month from now. */
+export function setExpiry(ids, on) {
+  const snaps = snapshot(ids, ['expiresAt']);
+  const d = new Date();
+  d.setMonth(d.getMonth() + 1);
+  const at = on ? d.getTime() : null;
+  store.updateNotes(ids, () => ({ expiresAt: at }), { touch: false });
+  toast(on ? t('expirySet', { when: date(at, { year: 'auto' }) }) : t('expiryCleared'), { action: t('undo'), onAction: undoFor(snaps) });
 }

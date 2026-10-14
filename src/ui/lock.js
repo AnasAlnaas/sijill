@@ -53,3 +53,16 @@ export function onResume(settings) {
 function recentlyExternal() {
   return Date.now() - externalActivityAt() < 120000 && externalActivityAt() > pausedAt - 3000;
 }
+
+/** Resolves once the app is unlocked (at once if it isn't locked). */
+export function whenUnlocked() {
+  if (!overlay) return Promise.resolve();
+  return new Promise((resolve) => {
+    const check = setInterval(() => {
+      if (!overlay) {
+        clearInterval(check);
+        resolve();
+      }
+    }, 150);
+  });
+}

@@ -407,23 +407,25 @@ input[type='range'] { inline-size: 100%; accent-color: var(--ink); min-block-siz
    evenly across the bottom edge, and rows/buttons are wide enough to tap from either side. */
 .bottombar {
   display: grid;
-  grid-template-columns: 1fr auto auto 1fr;
-  gap: .75rem;
+  grid-template-columns: 1fr auto auto auto 1fr;
+  gap: .5rem;
 }
 .bottombar .bar-start { grid-column: 1; justify-self: start; }
 .bottombar .bar-new.list { grid-column: 2; }
-.bottombar .bar-new.note { grid-column: 3; }
-.bottombar .bar-end { grid-column: 4; justify-self: end; }
+.bottombar .bar-new.mic { grid-column: 3; }
+.bottombar .bar-new.note { grid-column: 4; }
+.bottombar .bar-end { grid-column: 5; justify-self: end; }
 .bottombar .bar-full { grid-column: 1 / -1; }
 .bottombar.searching { grid-template-columns: 1fr; }
 .bottombar.selecting { display: flex; justify-content: space-around; }
 .bar-new {
-  inline-size: 4.5rem; block-size: 3.5rem; flex: none;
+  inline-size: 4rem; block-size: 3.5rem; flex: none;
   border-radius: 16px;
   display: grid; place-items: center;
 }
 .bar-new.note { background: var(--primary); color: var(--on-primary); }
 .bar-new.list { background: var(--surface); color: var(--ink); border: 1.5px solid var(--line-strong); }
+.bar-new.mic { background: var(--surface); color: var(--ink); border: 2.5px solid var(--ink); }
 .bar-new:active { filter: brightness(.92); }
 .sel-close {
   min-block-size: var(--tap); min-inline-size: var(--tap);
@@ -446,3 +448,24 @@ button.toast { inline-size: 100%; text-align: start; border: 0; cursor: pointer;
 .switch-row:active { background: var(--hover); }
 button.notice { inline-size: 100%; text-align: start; }
 .notice .act { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; flex: none; }
+.home-head { flex: 1; min-inline-size: 0; }
+.home-head .today { margin: .1rem 0 0; color: var(--ink-2); font-size: .9375rem; }
+/* Text written around checklists inside a note: only the last part stretches to fill the page. */
+.note-body .ed-body { min-block-size: 1.8em; }
+.note-body .ed-body.last { min-block-size: 40vh; }
+.checklist.inline { margin-block: .15rem; }
+.checklist.inline .cl-row { margin-inline-start: -.5rem; }
+
+/* dictation panel */
+.dictation {
+  display: grid; gap: .6rem;
+  padding: .75rem 1rem;
+  border-block-start: 1px solid var(--line-strong);
+  background: var(--raised);
+}
+.dictation .status { display: flex; align-items: center; gap: .5rem; font-weight: 600; }
+.dictation .live { margin: 0; min-block-size: 1.7em; color: var(--ink-2); font-family: var(--font-read); font-size: 1.0625rem; unicode-bidi: plaintext; text-align: start; }
+.dictation .meter { block-size: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.dictation .meter > i { display: block; block-size: 100%; inline-size: var(--l, 0%); background: var(--ink); transition: inline-size .1s linear; }
+.dictation .sheet-actions { margin: 0; }
+body.dictating .toasts { inset-block-end: auto; inset-block-start: calc(var(--sat) + 4rem); }

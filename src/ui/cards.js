@@ -4,9 +4,10 @@
 import { h, highlighted, dirOf } from './dom.js';
 import { icon, markerIcon } from './icons.js';
 import { progress } from '../core/model.js';
+import { parseTask } from '../core/blocks.js';
 import { matchRanges } from '../core/normalize.js';
 import { displayTime, isOverdue, repeatOf } from '../core/recurrence.js';
-import { fraction, dateTime, num } from '../core/format.js';
+import { fraction, dateTime, num, date } from '../core/format.js';
 import { t, markerName } from '../i18n.js';
 import { store } from '../state.js';
 import { fileUrl } from '../services/files.js';
@@ -43,6 +44,12 @@ export function reminderChip(note, { button = false, onClick } = {}) {
   return button
     ? h('button', { class: cls, style, onclick: onClick, 'aria-label': `${t('reminder')}: ${label}` }, ...kids)
     : h('span', { class: cls, style }, ...kids);
+}
+
+export function expiryChip(note, { button = false, onClick } = {}) {
+  const label = t('expiresOn', { when: date(note.expiresAt, { year: 'auto' }) });
+  const kids = [icon('hourglass', { size: 15 }), h('span', null, label)];
+  return button ? h('button', { class: 'chip', onclick: onClick }, ...kids) : h('span', { class: 'chip' }, ...kids);
 }
 
 export function renderCard(note, { terms, selected, showArchived }) {
@@ -87,6 +94,16 @@ export function renderCard(note, { terms, selected, showArchived }) {
         lastBlank = true;
         continue;
       }
+      const task = parseTask(raw);
+      if (task) {
+        // A checklist inside the note: shown with real boxes, like a checklist card.
+        body.append(h('div', { class: `card-item${task.indent ? ' indent' : ''}${task.done ? ' done' : ''}`, dir: dirOf(task.text) },
+          icon(task.done ? 'boxChecked' : 'boxEmpty', { size: 18 }),
+          h('span', null, text(task.text, terms))));
+        lastBlank = false;
+        count++;
+        continue;
+      }
       const isHeading = /^\s{0,3}#{1,6}\s/.test(raw);
       body.append(h('div', { class: `card-line${isHeading ? ' h' : ''}`, dir: dirOf(raw), style: !lastBlank || count === 0 ? null : { marginBlockStart: '.35em' } }, text(stripMd(raw), terms)));
       lastBlank = false;
@@ -106,6 +123,7 @@ export function renderCard(note, { terms, selected, showArchived }) {
   if (p) meta.push(h('span', { class: 'chip strong', 'aria-label': t('progress', { done: p.done, total: p.total }) }, icon('checklist', { size: 16 }), h('span', { class: 'progress' }, fraction(p.done, p.total))));
   const rc = reminderChip(note);
   if (rc) meta.push(rc);
+  if (note.expiresAt && !note.trashedAt) meta.push(expiryChip(note));
   if (showArchived && note.archived) meta.push(h('span', { class: 'chip' }, icon('archive', { size: 16 }), h('span', null, t('archive'))));
   for (const id of note.labels || []) {
     const name = store.labelName(id);

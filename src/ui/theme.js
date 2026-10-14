@@ -38,6 +38,7 @@ export function applyAppearance(s) {
     setShortcuts([
       { action: 'newNote', label: t('newNote') },
       { action: 'newChecklist', label: t('newChecklist') },
+      { action: 'voiceNote', label: t('voiceNote') },
     ]);
   }
   const meta = document.querySelector('meta[name="theme-color"]') || document.head.appendChild(Object.assign(document.createElement('meta'), { name: 'theme-color' }));

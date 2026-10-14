@@ -145,7 +145,15 @@ export class Store extends EventTarget {
     this.emit({ notes: ids, deleted: true });
   }
 
+  /**
+   * Housekeeping, on start and whenever the app comes back:
+   *   - notes set to "delete after a month" whose time has come move to Trash
+   *     (still recoverable there for 30 days),
+   *   - notes in Trash for more than 30 days are deleted.
+   */
   purgeOldTrash(now = Date.now()) {
+    const expired = this.allNotes().filter((n) => n.expiresAt && n.expiresAt <= now && !n.trashedAt).map((n) => n.id);
+    if (expired.length) this.updateNotes(expired, () => ({ trashedAt: now, pinned: false, expiresAt: null }), { touch: false });
     const old = this.allNotes().filter((n) => n.trashedAt && now - n.trashedAt > TRASH_DAYS * 86400000).map((n) => n.id);
     if (old.length) this.deleteForever(old);
   }
@@ -358,6 +366,7 @@ export function normalizeNote(n) {
     trashedAt: null,
     labels: [],
     reminder: null,
+    expiresAt: null,
     attachments: [],
     createdAt: n.updatedAt || Date.now(),
     updatedAt: n.createdAt || Date.now(),

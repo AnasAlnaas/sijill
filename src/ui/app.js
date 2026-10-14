@@ -16,7 +16,7 @@ import { searchNotes } from '../core/search.js';
 import { queryTerms } from '../core/normalize.js';
 import { displayTime, isOverdue, repeatOf } from '../core/recurrence.js';
 import { uid } from '../core/model.js';
-import { num } from '../core/format.js';
+import { num, date } from '../core/format.js';
 
 const state = {
   view: { kind: 'notes' },
@@ -122,7 +122,7 @@ function pinnedGroups(list) {
 function viewTitle() {
   const v = state.view;
   if (v.kind === 'label') return store.labelName(v.id) || t('labels');
-  if (v.kind === 'notes') return t('appName');
+  if (v.kind === 'notes') return t('homeTitle');
   return t(v.kind);
 }
 
@@ -147,7 +147,9 @@ function render() {
   } else {
     const isHome = state.view.kind === 'notes';
     parts.push(h('div', { class: 'page-head' },
-      h('h1', { class: `page-title${isHome ? ' wordmark' : ''}`, dir: 'auto' }, viewTitle()),
+      isHome
+        ? h('div', { class: 'home-head' }, h('h1', { class: 'page-title' }, viewTitle()), h('p', { class: 'today' }, date(Date.now(), { year: 'always', weekday: true })))
+        : h('h1', { class: 'page-title', dir: 'auto' }, viewTitle()),
       state.view.kind === 'label' ? h('button', { class: 'icon-btn', 'aria-label': t('rename'), onclick: renameCurrentLabel }, icon('edit')) : null,
       state.view.kind === 'trash' && store.allNotes().some((n) => n.trashedAt)
         ? h('button', { class: 'btn quiet', onclick: () => actions.emptyTrash() }, t('emptyTrashNow')) : null));
@@ -191,6 +193,7 @@ function renderBar() {
   normalBar.find.hidden = s;
   normalBar.list.hidden = s || trash;
   normalBar.add.hidden = s || trash;
+  normalBar.mic.hidden = s || trash;
 }
 
 function buildNormalBar() {
@@ -214,10 +217,11 @@ function buildNormalBar() {
   const pill = h('label', { class: 'search-pill bar-full' }, icon('search', { size: 22 }), searchInput, close);
   const menu = h('button', { class: 'icon-btn bar-start', 'aria-label': t('menu'), onclick: openMenu }, icon('menu'));
   const find = h('button', { class: 'icon-btn bar-end', 'aria-label': t('search'), onclick: () => { startSearch(); searchInput.focus(); } }, icon('search'));
+  const mic = h('button', { class: 'bar-new mic', 'aria-label': t('voiceNote'), onclick: () => createVoiceNote() }, icon('mic', { size: 28 }));
   const list = h('button', { class: 'bar-new list', 'aria-label': t('newChecklist'), onclick: () => createNote('list') }, icon('checklist', { size: 26 }));
   const add = h('button', { class: 'bar-new note', 'aria-label': t('newNote'), onclick: () => createNote('note') }, icon('plus', { size: 28 }));
-  fill(barEl, menu, list, add, find, pill);
-  normalBar = { lang: t('search'), pill, menu, find, list, add };
+  fill(barEl, menu, list, mic, add, find, pill);
+  normalBar = { lang: t('search'), pill, menu, find, list, mic, add };
 }
 
 function startSearch() {
@@ -240,7 +244,14 @@ function endSearch() {
   render();
 }
 
-export function createNote(type, fields = {}) {
+/** The quickest way in: a new note that starts listening straight away. */
+export function createVoiceNote() {
+  const n = createNote('note', {}, { focus: null });
+  currentEditor()?.startDictation();
+  return n;
+}
+
+export function createNote(type, fields = {}, { focus } = {}) {
   if (state.searching) endSearch();
   const v = state.view;
   const base = { type, ...fields };
@@ -248,7 +259,7 @@ export function createNote(type, fields = {}) {
   if (type === 'list' && !base.items) base.items = [{ id: uid(), text: '', done: false, indent: 0 }];
   if (v.kind === 'archive' || v.kind === 'trash') goTo({ kind: 'notes' });
   const n = store.createNote(base);
-  openEditor(n.id, { focus: type === 'list' ? 'firstItem' : 'body' });
+  openEditor(n.id, { focus: focus !== undefined ? focus : type === 'list' ? 'firstItem' : 'body' });
   return n;
 }
 
@@ -334,6 +345,9 @@ function renderSelectionBar() {
     class: 'icon-btn', 'aria-label': t('more'),
     onclick: () => menuSheet(null, [
       { icon: 'marker', label: t('marker'), onClick: () => markerSheet(notes.length === 1 ? notes[0].marker : null, (m) => { actions.setMarker(ids, m); clearSelection(); }) },
+      notes.every((n) => n.expiresAt)
+        ? { icon: 'hourglass', label: t('keepForever'), onClick: () => { actions.setExpiry(ids, false); clearSelection(); } }
+        : { icon: 'hourglass', label: t('expireMonth'), onClick: () => { actions.setExpiry(ids, true); clearSelection(); } },
       {
         icon: 'label',
         label: t('labels'),

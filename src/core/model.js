@@ -8,10 +8,13 @@
 //   pinned, archived, trashedAt,
 //   labels: [labelId],
 //   reminder: null | { at, repeat, snoozedUntil?, doneAt? },
+//   expiresAt: null | ms            'delete after a month': moves to Trash at this time
 //   attachments: [{ id, name, type, size }],
 //   createdAt, updatedAt, order,
 //   source?: { app: 'keep', key }      where an imported note came from (for de-duplication)
 // }
+
+import { bodyProgress, parseTask } from './blocks.js';
 
 export const MARKERS = [
   'circle', 'triangle', 'square', 'diamond', 'star', 'hexagon',
@@ -59,7 +62,7 @@ export function isEmptyNote(n) {
 
 /** "3/7"-style progress for a checklist, or null for a plain note / empty list. */
 export function progress(note) {
-  if (note.type !== 'list') return null;
+  if (note.type !== 'list') return bodyProgress(note.body);
   const items = (note.items || []).filter((i) => i.text.trim());
   if (!items.length) return null;
   return { done: items.filter((i) => i.done).length, total: items.length };
@@ -222,7 +225,10 @@ export function noteToMarkdown(note, { labelName = () => '', fileLink } = {}) {
 export function noteToPlainText(note) {
   const body = note.type === 'list'
     ? (note.items || []).map((i) => `${i.indent ? '    ' : ''}${i.done ? '☑' : '☐'} ${i.text}`).join('\n')
-    : note.body || '';
+    : (note.body || '').split('\n').map((line) => {
+      const t = parseTask(line);
+      return t ? `${t.indent ? '    ' : ''}${t.done ? '☑' : '☐'} ${t.text}` : line;
+    }).join('\n');
   return [note.title, body].filter((s) => s && s.trim()).join('\n\n');
 }
 

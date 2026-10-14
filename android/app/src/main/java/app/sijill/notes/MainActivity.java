@@ -11,6 +11,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(SijillDbPlugin.class);
         registerPlugin(SijillSystemPlugin.class);
         registerPlugin(SijillRemindersPlugin.class);
+        registerPlugin(SijillSpeechPlugin.class);
         super.onCreate(savedInstanceState);
         LaunchActions.capture(getIntent());
         // Text size is handled by the app itself (phone setting × the app's own slider),

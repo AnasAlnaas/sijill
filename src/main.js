@@ -5,7 +5,7 @@ import { App } from '@capacitor/app';
 import { store } from './state.js';
 import { isNative, deviceInfo, takeLaunchAction, onLaunchAction, setSecureScreen } from './native.js';
 import { applyAppearance, setSystemFontScale, onSystemThemeChange } from './ui/theme.js';
-import { mountApp, goTo, currentView, createNote } from './ui/app.js';
+import { mountApp, goTo, currentView, createNote, createVoiceNote } from './ui/app.js';
 import { openEditor, closeEditor } from './ui/editor.js';
 import { back, closeAll } from './ui/layers.js';
 import { toast } from './ui/overlays.js';
@@ -78,6 +78,10 @@ function handleLaunch(a) {
   if (a.action === 'openNote' && a.noteId && store.get(a.noteId)) {
     closeAll();
     openEditor(a.noteId);
+  } else if (a.action === 'voiceNote') {
+    closeEditor();
+    closeAll();
+    createVoiceNote();
   } else if (a.action === 'newNote' || a.action === 'newChecklist') {
     closeEditor();
     closeAll();

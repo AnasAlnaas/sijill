@@ -103,3 +103,20 @@ test('old trash is purged after 30 days', async () => {
   assert.equal(s.get(old.id), null);
   assert.ok(s.get(recent.id));
 });
+
+test('"delete after a month" moves the note to Trash when the time comes', async () => {
+  const s = new Store(new MemoryDb());
+  await s.init();
+  const now = Date.now();
+  const due = s.createNote({ title: 'temp', expiresAt: now - 1000, pinned: true });
+  const later = s.createNote({ title: 'later', expiresAt: now + 86400000 });
+  const forever = s.createNote({ title: 'keep' });
+  s.purgeOldTrash(now);
+  assert.ok(s.get(due.id).trashedAt, 'expired note is in Trash, not gone');
+  assert.equal(s.get(due.id).pinned, false);
+  assert.equal(s.get(later.id).trashedAt, null);
+  assert.equal(s.get(forever.id).trashedAt, null);
+  // 31 days later it is cleared out of Trash like any other note.
+  s.purgeOldTrash(now + 31 * 86400000);
+  assert.equal(s.get(due.id), null);
+});
