@@ -16,6 +16,7 @@ import { searchNotes } from '../core/search.js';
 import { queryTerms } from '../core/normalize.js';
 import { displayTime, isOverdue, repeatOf } from '../core/recurrence.js';
 import { uid } from '../core/model.js';
+import { num } from '../core/format.js';
 
 const state = {
   view: { kind: 'notes' },
@@ -171,17 +172,23 @@ function render() {
 
 let normalBar = null;
 
+// The bar is built for either thumb: the two "new" buttons sit together in the middle,
+// menu and search at the two ends of the bottom edge (see .bottombar in app.css).
 function renderBar() {
+  barEl.classList.toggle('selecting', state.selection.size > 0);
   if (state.selection.size) {
     normalBar = null;
+    barEl.classList.remove('searching');
     return renderSelectionBar();
   }
   if (!normalBar || normalBar.lang !== t('search')) buildNormalBar();
   // Show and hide rather than rebuild, so typing a search never drops the keyboard.
   const s = state.searching;
   const trash = state.view.kind === 'trash';
+  barEl.classList.toggle('searching', s);
+  normalBar.pill.hidden = !s;
   normalBar.menu.hidden = s;
-  normalBar.close.hidden = !s;
+  normalBar.find.hidden = s;
   normalBar.list.hidden = s || trash;
   normalBar.add.hidden = s || trash;
 }
@@ -204,11 +211,13 @@ function buildNormalBar() {
   searchInput.placeholder = t('searchPlaceholder');
   searchInput.setAttribute('aria-label', t('search'));
   const close = h('button', { class: 'icon-btn', 'aria-label': t('closeSearch'), onclick: (e) => { e.preventDefault(); endSearch(); } }, icon('close', { size: 20 }));
-  const menu = h('button', { class: 'icon-btn', 'aria-label': t('menu'), onclick: openMenu }, icon('menu'));
-  const list = h('button', { class: 'icon-btn', 'aria-label': t('newChecklist'), onclick: () => createNote('list') }, icon('checklist'));
-  const add = h('button', { class: 'new-btn', 'aria-label': t('newNote'), onclick: () => createNote('note') }, icon('plus', { size: 28 }));
-  fill(barEl, menu, h('label', { class: 'search-pill' }, icon('search', { size: 22 }), searchInput, close), list, add);
-  normalBar = { lang: t('search'), menu, close, list, add };
+  const pill = h('label', { class: 'search-pill bar-full' }, icon('search', { size: 22 }), searchInput, close);
+  const menu = h('button', { class: 'icon-btn bar-start', 'aria-label': t('menu'), onclick: openMenu }, icon('menu'));
+  const find = h('button', { class: 'icon-btn bar-end', 'aria-label': t('search'), onclick: () => { startSearch(); searchInput.focus(); } }, icon('search'));
+  const list = h('button', { class: 'bar-new list', 'aria-label': t('newChecklist'), onclick: () => createNote('list') }, icon('checklist', { size: 26 }));
+  const add = h('button', { class: 'bar-new note', 'aria-label': t('newNote'), onclick: () => createNote('note') }, icon('plus', { size: 28 }));
+  fill(barEl, menu, list, add, find, pill);
+  normalBar = { lang: t('search'), pill, menu, find, list, add };
 }
 
 function startSearch() {
@@ -321,39 +330,40 @@ function renderSelectionBar() {
     fn(ids);
     clearSelection();
   };
+  const more = h('button', {
+    class: 'icon-btn', 'aria-label': t('more'),
+    onclick: () => menuSheet(null, [
+      { icon: 'marker', label: t('marker'), onClick: () => markerSheet(notes.length === 1 ? notes[0].marker : null, (m) => { actions.setMarker(ids, m); clearSelection(); }) },
+      {
+        icon: 'label',
+        label: t('labels'),
+        onClick: () => {
+          const common = store.allLabels().filter((l) => notes.every((n) => n.labels.includes(l.id))).map((l) => l.id);
+          let prev = new Set(common);
+          labelsSheet(common, (next) => {
+            const nextSet = new Set(next);
+            const added = next.filter((x) => !prev.has(x));
+            const removed = [...prev].filter((x) => !nextSet.has(x));
+            store.updateNotes(ids, (n) => ({ labels: [...new Set([...n.labels.filter((x) => !removed.includes(x)), ...added])] }), { touch: false });
+            prev = nextSet;
+          });
+        },
+      },
+    ]),
+  }, icon('more'));
+  // Spread evenly along the bottom edge; the most-used action (archive / restore) in the middle.
   fill(barEl,
-    h('button', { class: 'icon-btn', 'aria-label': t('clearSelection'), onclick: clearSelection }, icon('close')),
-    h('span', { class: 'count', 'aria-live': 'polite' }, t('selected', { n: ids.length })),
+    h('button', { class: 'sel-close', 'aria-label': `${t('selected', { n: ids.length })} — ${t('clearSelection')}`, onclick: clearSelection },
+      icon('close'), h('span', { class: 'count', 'aria-live': 'polite' }, num(ids.length))),
     inTrash
       ? [
-        h('button', { class: 'icon-btn', 'aria-label': t('deleteForever'), onclick: async () => { if (await actions.deleteForever(ids)) clearSelection(); } }, icon('trash')),
         h('button', { class: 'icon-btn', 'aria-label': t('restore'), onclick: done(actions.restoreNotes) }, icon('restore')),
+        h('button', { class: 'icon-btn', 'aria-label': t('deleteForever'), onclick: async () => { if (await actions.deleteForever(ids)) clearSelection(); } }, icon('trash')),
       ]
       : [
-        h('button', {
-          class: 'icon-btn', 'aria-label': t('more'),
-          onclick: () => menuSheet(null, [
-            { icon: 'marker', label: t('marker'), onClick: () => markerSheet(notes.length === 1 ? notes[0].marker : null, (m) => { actions.setMarker(ids, m); clearSelection(); }) },
-            {
-              icon: 'label',
-              label: t('labels'),
-              onClick: () => {
-                const common = store.allLabels().filter((l) => notes.every((n) => n.labels.includes(l.id))).map((l) => l.id);
-                let prev = new Set(common);
-                labelsSheet(common, (next) => {
-                  const nextSet = new Set(next);
-                  const added = next.filter((x) => !prev.has(x));
-                  const removed = [...prev].filter((x) => !nextSet.has(x));
-                  store.updateNotes(ids, (n) => ({ labels: [...new Set([...n.labels.filter((x) => !removed.includes(x)), ...added])] }), { touch: false });
-                  prev = nextSet;
-                });
-              },
-            },
-          ]),
-        }, icon('more')),
-        // Nearest the thumb: the everyday actions. Trash sits one step further away.
-        h('button', { class: 'icon-btn', 'aria-label': t('moveToTrash'), onclick: done(actions.trashNotes) }, icon('trash')),
         h('button', { class: 'icon-btn', 'aria-label': allPinned ? t('unpin') : t('pin'), onclick: done((x) => actions.setPinned(x, !allPinned)) }, icon(allPinned ? 'pinFilled' : 'pin')),
         h('button', { class: 'icon-btn', 'aria-label': allArchived ? t('unarchive') : t('doArchive'), onclick: done(allArchived ? actions.unarchiveNotes : actions.archiveNotes) }, icon(allArchived ? 'unarchive' : 'archive')),
+        h('button', { class: 'icon-btn', 'aria-label': t('moveToTrash'), onclick: done(actions.trashNotes) }, icon('trash')),
+        more,
       ]);
 }

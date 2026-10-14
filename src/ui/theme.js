@@ -27,7 +27,6 @@ export function applyAppearance(s) {
   // Status and navigation bar icons: dark on paper, light on the dark themes.
   if (isNative) SystemBars.setStyle({ style: theme === 'light' ? SystemBarsStyle.Light : SystemBarsStyle.Dark }).catch(() => {});
   r.dataset.read = s.readingFont || 'naskh';
-  r.dataset.hand = s.hand === 'left' ? 'left' : 'right';
   r.lang = s.lang;
   r.dir = s.lang === 'ar' ? 'rtl' : 'ltr';
   const px = Math.round(16 * systemFontScale * (s.textScale || 1) * 10) / 10;
@@ -44,7 +43,7 @@ export function applyAppearance(s) {
   const meta = document.querySelector('meta[name="theme-color"]') || document.head.appendChild(Object.assign(document.createElement('meta'), { name: 'theme-color' }));
   meta.content = getComputedStyle(r).getPropertyValue('--bg').trim();
   try {
-    localStorage.setItem('sijill.boot', JSON.stringify({ theme: s.theme, accent: s.accent, lang: s.lang, hand: s.hand, fontPx: px }));
+    localStorage.setItem('sijill.boot', JSON.stringify({ theme: s.theme, accent: s.accent, lang: s.lang, fontPx: px }));
   } catch { /* private mode */ }
 }
 

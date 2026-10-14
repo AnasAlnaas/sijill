@@ -26,7 +26,6 @@ export const DEFAULT_SETTINGS = {
   lockAfter: 60, // seconds in the background before the lock comes back
   secureScreen: true,
   snoozeMinutes: 30,
-  hand: 'right', // which thumb the main buttons sit under
   checkedCollapsed: false,
   backupFolder: null,
   lastBackupAt: 0,

@@ -135,20 +135,21 @@ export function toast(message, { action, onAction, error = false, duration = 600
     document.body.append(toastBox);
   }
   fill(toastBox);
-  const el = h('div', { class: `toast${error ? ' error' : ''}` }, h('span', { class: 'msg' }, message));
   let timer;
   const dismiss = () => {
     clearTimeout(timer);
     el.remove();
   };
-  if (action) {
-    el.append(h('button', {
+  // With an action (Undo), the whole message is the button: reachable from either thumb.
+  const el = action
+    ? h('button', {
+      class: `toast${error ? ' error' : ''}`,
       onclick: () => {
         dismiss();
         onAction?.();
       },
-    }, action));
-  }
+    }, h('span', { class: 'msg' }, message), h('span', { class: 'act' }, action))
+    : h('div', { class: `toast${error ? ' error' : ''}` }, h('span', { class: 'msg' }, message));
   toastBox.append(el);
   timer = setTimeout(dismiss, duration);
   return dismiss;

@@ -161,14 +161,6 @@ mark { background: var(--mark); color: var(--on-mark); text-decoration: underlin
 .search-pill input::placeholder { color: var(--ink-2); opacity: 1; }
 .search-pill input::-webkit-search-cancel-button { display: none; }
 .search-pill .icon-btn { inline-size: 2.5rem; block-size: 2.5rem; }
-.new-btn {
-  inline-size: 3.5rem; block-size: 3.5rem; flex: none;
-  border-radius: 16px;
-  display: grid; place-items: center;
-  background: var(--primary); color: var(--on-primary);
-}
-.new-btn:active { filter: brightness(.9); }
-.bottombar .count { flex: 1; font-weight: 700; padding-inline: .25rem; }
 
 /* --- layers: editor, settings, sheets ---------------------------------------------------- */
 
@@ -342,7 +334,7 @@ mark { background: var(--mark); color: var(--on-mark); text-decoration: underlin
 .set-row .help { color: var(--ink-2); font-size: .875rem; margin: 0; }
 .set-row.inline { grid-template-columns: 1fr auto; align-items: center; }
 .set-row ol { margin: 0; padding-inline-start: 1.25rem; font-size: .9375rem; display: grid; gap: .35rem; }
-.set-row .btns { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: flex-end; }
+.set-row .btns { display: flex; flex-wrap: wrap; gap: .5rem; }
 .swatches { display: grid; gap: .4rem; }
 .swatch { display: flex; align-items: center; gap: .75rem; min-block-size: var(--tap); padding-inline: .6rem; border: 1.5px solid var(--line); border-radius: 10px; text-align: start; }
 .swatch .dot { inline-size: 1.75rem; block-size: 1.75rem; border-radius: 50%; border: 1.5px solid var(--ink); flex: none; }
@@ -409,14 +401,41 @@ input[type='range'] { inline-size: 100%; accent-color: var(--ink); min-block-siz
 /* Writing areas show the caret, not a focus ring. */
 .ed-title:focus-visible, .ed-body:focus-visible, .cl-text:focus-visible, .search-pill input:focus-visible { outline: none; }
 
-/* --- one-handed use --------------------------------------------------------------------------
-   Bars and action rows are laid out toward the thumb (right by default; Settings → Advanced),
-   whatever the reading direction: the last item in each sits under the thumb. Their contents
-   keep the language's own direction. */
-:root[data-hand='right'] :is(.bottombar, .editor-bar, .sheet-actions, .toast, .switch-row, .set-row .btns, .set-row.inline) { direction: ltr; }
-:root[data-hand='left'] :is(.bottombar, .editor-bar, .sheet-actions, .toast, .switch-row, .set-row .btns, .set-row.inline) { direction: rtl; }
-:root[dir='rtl'] :is(.bottombar, .editor-bar, .sheet-actions, .toast, .switch-row, .set-row .btns, .set-row.inline) > * { direction: rtl; }
-:root[dir='ltr'] :is(.bottombar, .editor-bar, .sheet-actions, .toast, .switch-row, .set-row .btns, .set-row.inline) > * { direction: ltr; }
+/* --- reachable with either thumb ----------------------------------------------------------------
+   The bottom edge is the easiest place for one-handed use, and its middle is the one spot both
+   thumbs reach. So: the main buttons sit together in the centre, other bar buttons are spread
+   evenly across the bottom edge, and rows/buttons are wide enough to tap from either side. */
+.bottombar {
+  display: grid;
+  grid-template-columns: 1fr auto auto 1fr;
+  gap: .75rem;
+}
+.bottombar .bar-start { grid-column: 1; justify-self: start; }
+.bottombar .bar-new.list { grid-column: 2; }
+.bottombar .bar-new.note { grid-column: 3; }
+.bottombar .bar-end { grid-column: 4; justify-self: end; }
+.bottombar .bar-full { grid-column: 1 / -1; }
+.bottombar.searching { grid-template-columns: 1fr; }
+.bottombar.selecting { display: flex; justify-content: space-around; }
+.bar-new {
+  inline-size: 4.5rem; block-size: 3.5rem; flex: none;
+  border-radius: 16px;
+  display: grid; place-items: center;
+}
+.bar-new.note { background: var(--primary); color: var(--on-primary); }
+.bar-new.list { background: var(--surface); color: var(--ink); border: 1.5px solid var(--line-strong); }
+.bar-new:active { filter: brightness(.92); }
+.sel-close {
+  min-block-size: var(--tap); min-inline-size: var(--tap);
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding-inline: .5rem; border-radius: 999px;
+  border: 1.5px solid var(--line-strong); font-weight: 700;
+}
+.editor-bar { justify-content: space-around; }
+.editor-bar .wide-half { flex: 1; }
+button.toast { inline-size: 100%; text-align: start; border: 0; cursor: pointer; }
+.toast .act { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; padding: .5rem .75rem; flex: none; }
+.set-row .btns .btn { flex: 1 1 auto; }
 
 .switch-row {
   display: flex; align-items: center; gap: 1rem;
@@ -425,3 +444,5 @@ input[type='range'] { inline-size: 100%; accent-color: var(--ink); min-block-siz
 }
 .switch-row .switch-text { flex: 1; display: grid; gap: .35rem; }
 .switch-row:active { background: var(--hover); }
+button.notice { inline-size: 100%; text-align: start; }
+.notice .act { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; flex: none; }

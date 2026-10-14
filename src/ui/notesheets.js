@@ -128,14 +128,14 @@ export function reminderSheet(note, onSave) {
     const notice = h('div');
     permission.status().then((s) => {
       if (s.notifications !== 'granted') {
-        fill(notice, h('div', { class: 'notice' }, icon('bellAlert'), h('span', { class: 'grow' }, t('allowNotifications')),
-          h('button', {
-            class: 'btn',
-            onclick: async () => {
-              const after = await permission.request();
-              if (after.notifications === 'granted') fill(notice);
-            },
-          }, t('allow'))));
+        // The whole notice is the button, so either thumb can reach it.
+        fill(notice, h('button', {
+          class: 'notice',
+          onclick: async () => {
+            const after = await permission.request();
+            if (after.notifications === 'granted') fill(notice);
+          },
+        }, icon('bellAlert'), h('span', { class: 'grow' }, t('allowNotifications')), h('span', { class: 'act' }, t('allow'))));
       }
     }).catch(() => {});
 

@@ -53,7 +53,7 @@ export function openSettings() {
 
 function set(key, value) {
   store.set(key, value);
-  if (['lang', 'theme', 'accent', 'textScale', 'numerals', 'calendar', 'readingFont', 'hand'].includes(key)) {
+  if (['lang', 'theme', 'accent', 'textScale', 'numerals', 'calendar', 'readingFont'].includes(key)) {
     applyAppearance(store.settings);
     rerender();
   }
@@ -75,7 +75,7 @@ function seg(options, value, onPick, label) {
     }, icon('check', { size: 18 }), text)));
 }
 
-// The whole row is the switch, so it can be tapped anywhere; the switch itself sits on the thumb side.
+// The whole row is the switch, so either thumb can tap it anywhere along its width.
 function switchRow(label, on, onToggle, help) {
   return h('button', { class: 'set-row switch-row', role: 'switch', 'aria-checked': String(on), onclick: () => onToggle(!on) },
     h('span', { class: 'switch-text' }, h('span', { class: 'label' }, label), help ? h('span', { class: 'help' }, help) : null),
@@ -130,17 +130,17 @@ async function build() {
 
   const notifOn = notif.notifications === 'granted';
   const reminders = group(t('remindersSection'),
-    h('div', { class: 'set-row inline' },
-      h('div', { class: 'label' }, notifOn ? t('notifStatusOn') : t('notifStatusOff')),
-      notifOn ? icon('check') : h('button', {
-        class: 'btn',
+    notifOn
+      ? h('div', { class: 'set-row inline' }, h('div', { class: 'label' }, t('notifStatusOn')), icon('check'))
+      : row(t('notifStatusOff'), h('div', { class: 'btns' }, h('button', {
+        class: 'btn primary',
         onclick: async () => {
           const r = await permission.request();
           if (r.notifications !== 'granted') await openSystemSettings('notifications');
           syncReminders();
           openSettingsRefresh();
         },
-      }, t('allow'))),
+      }, icon('bell'), t('allow')))),
     row(t('snoozeLength'), seg([[10, t('minutes', { n: 10 })], [30, t('minutes', { n: 30 })], [60, t('hour')]], s.snoozeMinutes, (v) => set('snoozeMinutes', v), t('snoozeLength'))));
 
   const internal = await listInternalBackups();
@@ -202,7 +202,6 @@ async function build() {
       h('button', { class: 'btn', onclick: () => keepImport() }, icon('inbox'), t('importKeep'))), t('importKeepHelp')));
 
   const advanced = group(t('advanced'),
-    row(t('hand'), seg([['right', t('handRight')], ['left', t('handLeft')]], s.hand || 'right', (v) => set('hand', v), t('hand')), t('handHelp')),
     row(t('readingFont'), seg([['naskh', t('fontNaskh')], ['amiri', t('fontAmiri')]], s.readingFont || 'naskh', (v) => set('readingFont', v), t('readingFont')),
       h('span', { class: 'sample', style: { display: 'block' } }, t('sample'))),
     h('div', { class: 'set-row' },
