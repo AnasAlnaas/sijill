@@ -2,13 +2,13 @@
 
 A private notes app for Android, in Arabic and English. Everything lives on the phone; no account.
 
-**Current version: 0.2.0** → `release/Sijill-0.2.0.apk`
+**Current version: 0.2.1** → `release/Sijill-0.2.1.apk`
 
 ---
 
 ## Install on your phone (Redmi Note 11)
 
-1. Copy `release\Sijill-0.2.0.apk` to the phone (USB cable, Google Drive, Telegram "Saved messages", anything).
+1. Copy `release\Sijill-0.2.1.apk` to the phone (USB cable, Google Drive, Telegram "Saved messages", anything).
 2. On the phone, open the file (Files app → Downloads). If asked, allow **"Install unknown apps"** for the app you opened it from.
 3. MIUI may show a security scan or ask you to wait a few seconds; then tap **Install**.
 4. Open **سِجِلّ**. When you set your first reminder, allow notifications.
@@ -27,7 +27,8 @@ Also: don't use MIUI's "clean"/rocket button on Sijill. A force stop cancels all
 
 - Tap the microphone in the middle of the bottom bar (or long-press the app icon → **Voice note**): a new note opens and starts listening at once. Speak; your words go into the note as they are recognised. Tap **Stop dictating** when done.
 - Switch between **العربية** and **English** in the panel. Dictation stops by itself after about 20 seconds of silence, or when you leave the app. No audio is ever saved; only the text.
-- **Privacy / offline:** Sijill asks Android to use the offline recogniser. If the phone has no offline pack for the language, the words go through Google’s speech service instead, and Sijill tells you so. To keep it on the phone, download the packs: Settings → Google → (Search, Assistant & Voice) → Voice → *Offline speech recognition* → add **Arabic** and **English**. (Menu names vary slightly on Xiaomi.)
+- **Online by default:** dictation uses Google’s online speech recognition, which is the most accurate (especially for Arabic). Your speech is sent to Google’s speech service to be turned into text; no audio is kept by Sijill.
+- **No internet?** Sijill switches to the phone’s offline recogniser and tells you. That needs the offline packs: Settings → Google → (Search, Assistant & Voice) → Voice → *Offline speech recognition* → add **Arabic** and **English** (menu names vary slightly on Xiaomi).
 
 ### Checklists inside a note
 

@@ -22,7 +22,8 @@ import com.getcapacitor.annotation.PermissionCallback;
 import java.util.ArrayList;
 
 /**
- * Dictation with the phone's own speech recogniser. Only text comes back; no audio is kept.
+ * Dictation with Google's speech recogniser (online for the best accuracy; the phone's offline
+ * recogniser is used when there is no internet). Only text comes back; no audio is kept.
  * Listening continues across pauses (the recogniser is restarted after each phrase) until
  * the user stops, the app leaves the screen, or there has been silence for a while.
  */
@@ -40,7 +41,9 @@ public class SijillSpeechPlugin extends Plugin {
     private String lang = "ar-SA";
     private int silentRuns;
     private long lastLevelAt;
-    private boolean preferOffline = true;
+    private boolean ready;
+    private boolean retriedStuck;
+    private boolean preferOffline = false; // Google's online recogniser first: best accuracy and punctuation
 
     @PluginMethod
     public void available(PluginCall call) {
@@ -84,7 +87,8 @@ public class SijillSpeechPlugin extends Plugin {
         }
         lang = call.getString("lang", "ar-SA");
         silentRuns = 0;
-        preferOffline = true;
+        retriedStuck = false;
+        preferOffline = false;
         active = true;
         main.post(this::listen);
         call.resolve();
@@ -126,26 +130,47 @@ public class SijillSpeechPlugin extends Plugin {
                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, lang)
                 .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
                 .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-                // Prefer the offline model when the language pack is on the phone (more private).
+                // Online by default (more accurate); offline only as the no-internet fallback.
                 .putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, preferOffline)
                 .putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2500L)
                 .putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2000L);
-        if (Build.VERSION.SDK_INT >= 33) {
-            // Ask for punctuation where the recogniser supports it.
+        if (Build.VERSION.SDK_INT >= 33 && preferOffline) {
+            // Punctuation formatting: Google only accepts this for offline recognition
+            // (sending it with an online request is rejected).
             i.putExtra(RecognizerIntent.EXTRA_ENABLE_FORMATTING, RecognizerIntent.FORMATTING_OPTIMIZE_QUALITY);
         }
+        ready = false;
         try {
             recognizer.startListening(i);
+            main.removeCallbacks(watchdog);
+            main.postDelayed(watchdog, 7000);
         } catch (Exception e) {
             error("start", -1);
         }
     }
+
+    // If the speech service never answers (it can crash or be restarting), reconnect once,
+    // then report it rather than seeming to listen forever.
+    private final Runnable watchdog = () -> {
+        if (!active || ready) return;
+        if (recognizer != null) {
+            recognizer.destroy();
+            recognizer = null;
+        }
+        if (retriedStuck) {
+            error("recognizer", -2);
+        } else {
+            retriedStuck = true;
+            listen();
+        }
+    };
 
     private void restart(long delay) {
         main.postDelayed(this::listen, delay);
     }
 
     private void finish(String reason) {
+        main.removeCallbacks(watchdog);
         if (recognizer != null) {
             recognizer.destroy();
             recognizer = null;
@@ -173,6 +198,8 @@ public class SijillSpeechPlugin extends Plugin {
     private final RecognitionListener listener = new RecognitionListener() {
         @Override
         public void onReadyForSpeech(Bundle params) {
+            ready = true;
+            main.removeCallbacks(watchdog);
             JSObject o = new JSObject();
             o.put("listening", true);
             notifyListeners("state", o);
@@ -213,18 +240,24 @@ public class SijillSpeechPlugin extends Plugin {
                 }
                 return;
             }
-            if (preferOffline && (code == SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED || code == SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE)) {
-                // No offline speech pack for this language on the phone: use the online recogniser,
-                // and let the app say so (the words then go through the speech service).
-                preferOffline = false;
+            boolean network = code == SpeechRecognizer.ERROR_NETWORK || code == SpeechRecognizer.ERROR_NETWORK_TIMEOUT || code == SpeechRecognizer.ERROR_SERVER;
+            if (network && !preferOffline) {
+                // No internet: try the phone's offline recogniser (works if the language pack is installed),
+                // and let the app say so.
+                preferOffline = true;
                 JSObject n = new JSObject();
-                n.put("kind", "online");
+                n.put("kind", "offline");
                 notifyListeners("notice", n);
                 if (recognizer != null) {
                     recognizer.destroy();
                     recognizer = null;
                 }
                 restart(200);
+                return;
+            }
+            if (preferOffline && (code == SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED || code == SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE)) {
+                // Offline was the fallback for having no internet, and there's no offline pack either.
+                error("network", code);
                 return;
             }
             if (code == SpeechRecognizer.ERROR_RECOGNIZER_BUSY || code == SpeechRecognizer.ERROR_CLIENT) {

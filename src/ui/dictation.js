@@ -76,13 +76,13 @@ export class DictationPanel {
           this.renderLive();
         },
         notice: (kind) => {
-          if (kind === 'online' && !this.toldOnline) {
-            this.toldOnline = true;
-            toast(t('speechOnline'), { duration: 9000 });
+          if (kind === 'offline' && !this.toldOffline) {
+            this.toldOffline = true;
+            toast(t('speechOffline'), { duration: 8000 });
           }
         },
         error: (kind) => {
-          toast(kind === 'network' ? t('speechNetwork') : kind === 'permission' ? t('micDenied') : t('failed', { msg: kind }), { error: true, duration: 8000 });
+          toast(kind === 'network' ? t('speechNetwork') : kind === 'permission' ? t('micDenied') : t('speechStuck'), { error: true, duration: 8000 });
         },
         end: () => {
           this.session = null;
@@ -99,10 +99,6 @@ export class DictationPanel {
           this.render();
         },
       });
-      if (this.state === 'starting') {
-        this.state = 'listening';
-        this.render();
-      }
     } catch (e) {
       this.state = 'stopped';
       this.render();
@@ -150,7 +146,7 @@ export class DictationPanel {
       onclick: () => this.setLang(code),
     }, icon('check', { size: 18 }), label);
     fill(this.el,
-      h('div', { class: 'status' }, icon(on ? 'mic' : 'info', { size: 22 }), h('span', null, on ? t('listening') : t('paused'))),
+      h('div', { class: 'status' }, icon(on ? 'mic' : 'info', { size: 22 }), h('span', null, this.state === 'starting' ? t('startingMic') : on ? t('listening') : t('paused'))),
       on ? this.liveEl : null,
       on ? h('div', { class: 'meter', 'aria-hidden': 'true' }, this.meterEl) : null,
       h('div', { class: 'seg', role: 'radiogroup', 'aria-label': t('dictationLang') }, langBtn('ar', 'العربية'), langBtn('en', 'English')),

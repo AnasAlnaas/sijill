@@ -1,5 +1,5 @@
-// Dictation: speech → text, through the phone's own speech recogniser (native plugin
-// SijillSpeech). In a desktop browser preview, Chrome's built-in recogniser stands in.
+// Dictation: speech → text, through Google's speech recogniser (native plugin SijillSpeech;
+// online for accuracy, offline when there is no internet). In a desktop browser preview, Chrome's built-in recogniser stands in.
 // Only text comes back; audio is never stored.
 
 import { registerPlugin } from '@capacitor/core';
@@ -24,7 +24,7 @@ export async function requestMic() {
 
 /**
  * Start listening. handlers: { partial(text), final(text), level(0..1), listening(), end(reason), error(kind),
- *   notice('online') — no offline speech pack, so the online recogniser is used }
+ *   notice('offline') — no internet, so the phone's offline recogniser is used }
  * Returns a session with stop().
  */
 export async function startDictation(lang, handlers) {
