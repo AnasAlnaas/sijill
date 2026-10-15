@@ -502,3 +502,23 @@ body.dictating .toasts { inset-block-end: auto; inset-block-start: calc(var(--sa
 .year-h { display: flex; align-items: center; gap: .5rem; font-size: 1.0625rem; color: var(--ink); }
 .year-h .grow { flex: 1; font-weight: 700; }
 .btn.small { min-block-size: var(--tap); padding-inline: .6rem; font-size: .875rem; font-weight: 600; }
+
+/* --- cards never wider than the screen ------------------------------------------------------
+   A grid item's minimum width defaults to its longest unbroken line; long one-line previews
+   would push cards past the screen edge. Let them shrink; long lines end in "…". */
+.cards { grid-template-columns: minmax(0, 1fr); }
+.card-wrap, .card { min-inline-size: 0; }
+
+/* --- bottom bars keep a fixed size -----------------------------------------------------------
+   The text-size setting enlarges reading text, not the buttons at the bottom (which must always
+   fit on the screen). Sizes here are in px, not rem, on purpose. */
+:root { --bar-h: calc(72px + var(--sab)); }
+.bottombar { gap: 8px; padding: 8px calc(10px + var(--sar)) calc(8px + var(--sab)) calc(10px + var(--sal)); font-size: 16px; }
+.bottombar .icon-btn, .editor-bar .icon-btn { inline-size: 48px; block-size: 48px; }
+.bar-new { inline-size: 64px; block-size: 56px; border-radius: 16px; }
+.search-pill { min-block-size: 48px; padding-inline: 14px 4px; gap: 8px; }
+.search-pill input { font-size: 16px; min-block-size: 44px; }
+.search-pill .icon-btn { inline-size: 40px; block-size: 40px; }
+.sel-close { min-block-size: 48px; min-inline-size: 48px; padding-inline: 8px; font-size: 16px; gap: 6px; }
+.editor-bar { padding: 6px 8px calc(6px + var(--sab)); font-size: 16px; }
+.editor-bar .btn { min-block-size: 48px; font-size: 16px; padding-inline: 16px; }

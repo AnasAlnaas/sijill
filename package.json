@@ -1,6 +1,6 @@
 {
   "name": "sijill",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "description": "سِجِلّ — a private, offline-first notes app for Android (Arabic + English).",
   "type": "module",
