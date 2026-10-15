@@ -2,13 +2,13 @@
 
 A private notes app for Android, in Arabic and English. Everything lives on the phone; no account.
 
-**Current version: 0.3.0** → `release/Sijill-0.3.0.apk`
+**Current version: 0.3.1** → `release/Sijill-0.3.1.apk`
 
 ---
 
 ## Install on your phone (Redmi Note 11)
 
-1. Copy `release\Sijill-0.3.0.apk` to the phone (USB cable, Google Drive, Telegram "Saved messages", anything).
+1. Copy `release\Sijill-0.3.1.apk` to the phone (USB cable, Google Drive, Telegram "Saved messages", anything).
 2. On the phone, open the file (Files app → Downloads). If asked, allow **"Install unknown apps"** for the app you opened it from.
 3. MIUI may show a security scan or ask you to wait a few seconds; then tap **Install**.
 4. Open **سِجِلّ**. When you set your first reminder, allow notifications.

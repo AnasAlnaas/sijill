@@ -2,8 +2,7 @@
 // numerals and calendar. Also caches them for the next start so nothing flashes.
 
 import { setLang, t } from '../i18n.js';
-import { SystemBars, SystemBarsStyle } from '@capacitor/core';
-import { setShortcuts, setBarColors, isNative } from '../native.js';
+import { setShortcuts, setBarColors } from '../native.js';
 import { setFormatPrefs } from '../core/format.js';
 
 let systemFontScale = 1;
@@ -24,8 +23,6 @@ export function applyAppearance(s) {
   const theme = resolvedTheme(s.theme);
   r.dataset.theme = theme;
   r.dataset.accent = s.accent || 'none';
-  // Status and navigation bar icons: dark on paper, light on the dark themes.
-  if (isNative) SystemBars.setStyle({ style: theme === 'light' ? SystemBarsStyle.Light : SystemBarsStyle.Dark }).catch(() => {});
   r.dataset.read = s.readingFont || 'naskh';
   r.lang = s.lang;
   r.dir = s.lang === 'ar' ? 'rtl' : 'ltr';
@@ -43,7 +40,10 @@ export function applyAppearance(s) {
   }
   const meta = document.querySelector('meta[name="theme-color"]') || document.head.appendChild(Object.assign(document.createElement('meta'), { name: 'theme-color' }));
   meta.content = getComputedStyle(r).getPropertyValue('--bg').trim();
-  setBarColors(meta.content);
+  // Status and navigation bars: the theme's background, with dark icons on paper and light ones
+  // on the dark themes. Applied again shortly after, in case Android re-applies its own on start.
+  setBarColors(meta.content, theme === 'light');
+  setTimeout(() => setBarColors(meta.content, theme === 'light'), 500);
   try {
     localStorage.setItem('sijill.boot', JSON.stringify({ theme: s.theme, accent: s.accent, lang: s.lang, fontPx: px }));
   } catch { /* private mode */ }

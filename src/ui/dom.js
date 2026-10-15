@@ -73,7 +73,8 @@ function caretTop(ta) {
   if (!mirror) {
     mirror = document.createElement('div');
     mirror.setAttribute('aria-hidden', 'true');
-    mirror.style.cssText = 'position:absolute;visibility:hidden;inset-block-start:0;inset-inline-start:-9999px;white-space:pre-wrap;overflow-wrap:break-word;';
+    // Fixed at the top-left, invisible and inside the screen: it must never widen the page.
+    mirror.style.cssText = 'position:fixed;top:0;left:0;visibility:hidden;pointer-events:none;z-index:-1;contain:layout paint;white-space:pre-wrap;overflow-wrap:break-word;';
     document.body.append(mirror);
   }
   const cs = getComputedStyle(ta);

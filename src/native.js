@@ -71,8 +71,10 @@ export function onLaunchAction(fn) {
 }
 
 /** Status bar, navigation bar and window background in the theme's colour. */
-export async function setBarColors(color) {
-  if (isNative && color) await System.setBarColors({ color }).catch(() => {});
+export async function setBarColors(color, light = false) {
+  // Minified CSS writes colours like #000; Android only reads the six-digit form.
+  const c = String(color || '').trim().replace(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i, '#$1$1$2$2$3$3');
+  if (isNative && /^#[0-9a-f]{6}$/i.test(c)) await System.setBarColors({ color: c, light }).catch(() => {});
 }
 
 /** Long-press shortcuts on the app icon, labelled in the app's language. */

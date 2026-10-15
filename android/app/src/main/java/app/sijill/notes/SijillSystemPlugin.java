@@ -32,6 +32,8 @@ import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.pm.ShortcutInfoCompat;
 import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.core.graphics.drawable.IconCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.FragmentActivity;
@@ -116,31 +118,57 @@ public class SijillSystemPlugin extends Plugin {
      * Paint the status bar, navigation bar and window behind the app in the theme's background,
      * so the true-black theme is black edge to edge (pixels off on AMOLED screens).
      */
+    private static Integer lastBarColor;
+    private static boolean lastBarLight;
+
+    /** Re-apply the app's bar colours (Capacitor resets them on configuration changes). */
+    static void reapplyBars(Activity act) {
+        if (lastBarColor != null) applyBars(act, lastBarColor, lastBarLight);
+    }
+
+    static void applyBars(Activity act, int color, boolean light) {
+        lastBarColor = color;
+        lastBarLight = light;
+        Window w = act.getWindow();
+        // Icons: dark on a light background, light on a dark one. Done here rather than through
+        // Capacitor's SystemBars.setStyle, which also resets the window background to the theme's.
+        WindowInsetsControllerCompat ic = WindowCompat.getInsetsController(w, w.getDecorView());
+        ic.setAppearanceLightStatusBars(light);
+        ic.setAppearanceLightNavigationBars(light);
+        w.getDecorView().setBackgroundColor(color);
+        if (act instanceof com.getcapacitor.BridgeActivity) {
+            ((com.getcapacitor.BridgeActivity) act).getBridge().getWebView().setBackgroundColor(color);
+        }
+        if (Build.VERSION.SDK_INT < 35) {
+            // Android 15+ draws the app behind transparent bars itself; older versions need this.
+            w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            w.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            w.setStatusBarColor(color);
+            w.setNavigationBarColor(color);
+            if (Build.VERSION.SDK_INT >= 29) {
+                w.setStatusBarContrastEnforced(false);
+                w.setNavigationBarContrastEnforced(false);
+            }
+        }
+    }
+
     @PluginMethod
     public void setBarColors(PluginCall call) {
         int color;
         try {
-            color = Color.parseColor(call.getString("color", "#000000"));
+            String c = call.getString("color", "#000000").trim();
+            if (c.matches("#[0-9a-fA-F]{3}")) {
+                c = "#" + c.charAt(1) + c.charAt(1) + c.charAt(2) + c.charAt(2) + c.charAt(3) + c.charAt(3);
+            }
+            color = Color.parseColor(c);
         } catch (Exception e) {
             call.reject("bad colour");
             return;
         }
+        boolean light = Boolean.TRUE.equals(call.getBoolean("light", false));
         Activity act = getActivity();
         act.runOnUiThread(() -> {
-            Window w = act.getWindow();
-            w.getDecorView().setBackgroundColor(color);
-            getBridge().getWebView().setBackgroundColor(color);
-            if (Build.VERSION.SDK_INT < 35) {
-                // Android 15+ draws the app behind transparent bars itself; older versions need this.
-                w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                w.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-                w.setStatusBarColor(color);
-                w.setNavigationBarColor(color);
-                if (Build.VERSION.SDK_INT >= 29) {
-                    w.setStatusBarContrastEnforced(false);
-                    w.setNavigationBarContrastEnforced(false);
-                }
-            }
+            applyBars(act, color, light);
             call.resolve();
         });
     }

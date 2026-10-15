@@ -10,10 +10,13 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; background: var(--bg); }
+/* Nothing may ever make the page wider than the screen (Android would widen the whole layout). */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; background: var(--bg); overflow-x: hidden; }
 body {
   margin: 0;
   min-height: 100dvh;
+  overflow-x: clip;
+  max-inline-size: 100vw;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-ui);
@@ -183,7 +186,7 @@ mark { background: var(--mark); color: var(--on-mark); text-decoration: underlin
 }
 .layer-top .title { flex: 1; font-weight: 700; font-size: 1.125rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .layer-top .stamp { flex: 1; text-align: center; color: var(--ink-2); font-size: .8125rem; }
-.layer-scroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.layer-scroll { flex: 1; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 
 .editor { background: var(--surface); }
 .editor .layer-scroll { padding: .25rem 1.25rem 3rem; }
@@ -473,7 +476,7 @@ body.dictating .toasts { inset-block-end: auto; inset-block-start: calc(var(--sa
 :root[data-theme='black'] :is(.editor, .editor-bar) { background: var(--bg); }
 
 /* swipe to archive / trash */
-.card-wrap { position: relative; border-radius: var(--radius); }
+.card-wrap { position: relative; border-radius: var(--radius); overflow: clip; } /* a swiped card slides out within its slot */
 .card.swiping { position: relative; z-index: 1; touch-action: none; }
 .swipe-bg {
   position: absolute; inset: 0; border-radius: var(--radius);
