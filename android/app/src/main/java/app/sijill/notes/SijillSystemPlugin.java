@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import android.print.PrintManager;
 import android.provider.OpenableColumns;
 import android.provider.Settings;
 import android.util.Base64;
+import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -106,6 +108,39 @@ public class SijillSystemPlugin extends Plugin {
         getActivity().runOnUiThread(() -> {
             if (on) getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
             else getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+            call.resolve();
+        });
+    }
+
+    /**
+     * Paint the status bar, navigation bar and window behind the app in the theme's background,
+     * so the true-black theme is black edge to edge (pixels off on AMOLED screens).
+     */
+    @PluginMethod
+    public void setBarColors(PluginCall call) {
+        int color;
+        try {
+            color = Color.parseColor(call.getString("color", "#000000"));
+        } catch (Exception e) {
+            call.reject("bad colour");
+            return;
+        }
+        Activity act = getActivity();
+        act.runOnUiThread(() -> {
+            Window w = act.getWindow();
+            w.getDecorView().setBackgroundColor(color);
+            getBridge().getWebView().setBackgroundColor(color);
+            if (Build.VERSION.SDK_INT < 35) {
+                // Android 15+ draws the app behind transparent bars itself; older versions need this.
+                w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                w.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                w.setStatusBarColor(color);
+                w.setNavigationBarColor(color);
+                if (Build.VERSION.SDK_INT >= 29) {
+                    w.setStatusBarContrastEnforced(false);
+                    w.setNavigationBarContrastEnforced(false);
+                }
+            }
             call.resolve();
         });
     }

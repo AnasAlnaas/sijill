@@ -87,7 +87,7 @@ a, .link { color: var(--link); text-decoration: underline; text-underline-offset
   display: block; inline-size: 100%;
   text-align: start;
   background: var(--surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--card-line);
   border-radius: var(--radius);
   padding: .8rem 1rem .9rem;
   position: relative;
@@ -327,7 +327,7 @@ mark { background: var(--mark); color: var(--on-mark); text-decoration: underlin
 .settings-inner { max-inline-size: 40rem; margin-inline: auto; }
 .set-group { margin-block: 1rem 1.75rem; }
 .set-group > h2 { font-size: .9375rem; font-weight: 700; color: var(--ink-2); margin: 0 .25rem .5rem; }
-.set-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: .25rem 1rem; }
+.set-card { background: var(--surface); border: 1px solid var(--card-line); border-radius: var(--radius); padding: .25rem 1rem; }
 .set-row { padding-block: .9rem; border-block-end: 1px solid var(--line); display: grid; gap: .55rem; }
 .set-row:last-child { border-block-end: 0; }
 .set-row .label { font-weight: 600; }
@@ -469,3 +469,20 @@ button.notice { inline-size: 100%; text-align: start; }
 .dictation .meter > i { display: block; block-size: 100%; inline-size: var(--l, 0%); background: var(--ink); transition: inline-size .1s linear; }
 .dictation .sheet-actions { margin: 0; }
 body.dictating .toasts { inset-block-end: auto; inset-block-start: calc(var(--sat) + 4rem); }
+/* True black: the open note is black too, edge to edge (AMOLED pixels off). */
+:root[data-theme='black'] :is(.editor, .editor-bar) { background: var(--bg); }
+
+/* swipe to archive / trash */
+.card-wrap { position: relative; border-radius: var(--radius); }
+.card.swiping { position: relative; z-index: 1; touch-action: none; }
+.swipe-bg {
+  position: absolute; inset: 0; border-radius: var(--radius);
+  display: flex; align-items: center; gap: .6rem;
+  padding-inline: 1.25rem;
+  background: var(--sel); color: var(--on-sel);
+  font-weight: 700;
+  border: 1.5px dashed var(--card-line);
+}
+.swipe-bg.left { justify-content: flex-start; }
+.swipe-bg.right { justify-content: flex-end; }
+.swipe-bg.armed { background: var(--ink); color: var(--on-ink); border-style: solid; border-color: var(--ink); }

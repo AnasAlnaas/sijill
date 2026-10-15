@@ -2,13 +2,13 @@
 
 A private notes app for Android, in Arabic and English. Everything lives on the phone; no account.
 
-**Current version: 0.2.1** → `release/Sijill-0.2.1.apk`
+**Current version: 0.2.2** → `release/Sijill-0.2.2.apk`
 
 ---
 
 ## Install on your phone (Redmi Note 11)
 
-1. Copy `release\Sijill-0.2.1.apk` to the phone (USB cable, Google Drive, Telegram "Saved messages", anything).
+1. Copy `release\Sijill-0.2.2.apk` to the phone (USB cable, Google Drive, Telegram "Saved messages", anything).
 2. On the phone, open the file (Files app → Downloads). If asked, allow **"Install unknown apps"** for the app you opened it from.
 3. MIUI may show a security scan or ask you to wait a few seconds; then tap **Install**.
 4. Open **سِجِلّ**. When you set your first reminder, allow notifications.
@@ -37,6 +37,10 @@ In any note, tap the checklist-with-plus button in the bottom bar to add a check
 ### Delete after a month
 
 In a note, ⋮ → **Delete after a month**. A month later the note moves to Trash (recoverable for 30 more days). ⋮ → **Keep forever** cancels it.
+
+### Swipe a card
+
+On the main screen, swipe a card toward the end of the reading line to **archive** it (left in Arabic, right in English), or toward the start to move it to **Trash**. What will happen is written behind the card while you drag; let go early to cancel. Every swipe offers Undo.
 
 ## Update to a newer version
 

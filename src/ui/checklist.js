@@ -1,7 +1,7 @@
 // A checklist editor: the whole-note checklist (with ticked items moved to a collapsible
 // "checked" section) and, in inline mode, a checklist inside a note's text (items stay in place).
 
-import { h, fill, autoGrow, dirOf } from './dom.js';
+import { h, fill, autoGrow, dirOf, keepCaretVisible } from './dom.js';
 import { icon } from './icons.js';
 import { toast } from './overlays.js';
 import { store } from '../state.js';
@@ -114,6 +114,7 @@ export class Checklist {
         return;
       }
       autoGrow(ta);
+      requestAnimationFrame(() => keepCaretVisible(ta));
       setRowDir(row, ta.value);
       this.save(this.items.map((i) => (i.id === item.id ? { ...i, text: ta.value } : i)));
     });

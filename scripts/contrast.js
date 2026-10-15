@@ -69,6 +69,8 @@ for (const [tn, t] of Object.entries(themes)) {
     check(tn, an, 'link on bg', link, t.bg, 7);
     // Toast: inverted.
     check(tn, an, 'toast text', t['on-ink'], t.ink, 7);
+    // Card edges must be easy to see in grayscale (WCAG 1.4.11 asks 3:1).
+    check(tn, an, 'card edge on background', t['card-line'], t.bg, 3);
     // Borders of inputs and checkboxes (WCAG 1.4.11 asks 3:1).
     check(tn, an, 'control border on surface', t['line-strong'], t.surface, 3);
     check(tn, an, 'control border on raised', t['line-strong'], t.raised, 3);

@@ -10,7 +10,7 @@
 //   - Enter on an empty item ends the list and goes back to text,
 //   - Backspace on an empty first item removes it and returns to the text above.
 
-import { h, fill, autoGrow } from './dom.js';
+import { h, fill, autoGrow, keepCaretVisible } from './dom.js';
 import { Checklist } from './checklist.js';
 import { parseBlocks, serializeBlocks, splitForChecklist, TASK_RE } from '../core/blocks.js';
 import { uid } from '../core/model.js';
@@ -101,6 +101,7 @@ export class NoteBody {
         return;
       }
       this.save();
+      requestAnimationFrame(() => keepCaretVisible(ta));
     });
     // Remember the caret, in case tapping a toolbar button takes focus away from the text.
     ta.addEventListener('blur', () => {

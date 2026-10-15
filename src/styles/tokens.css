@@ -28,10 +28,11 @@
   --ease: cubic-bezier(.2, .7, .2, 1);
 
   /* Light: paper */
-  --bg: #f3f2ee;
-  --surface: #fbfaf7;
+  --bg: #ecebe6;
+  --surface: #fdfcfa;
   --raised: #ffffff;
   --line: #d6d4cc;
+  --card-line: #82807a;          /* card edges: 3:1 against the background, visible in grayscale */
   --line-strong: #85837c;
   --ink: #161513;
   --ink-2: #47453f;
@@ -52,8 +53,9 @@
 }
 
 :root[data-theme='dark'] {
-  --bg: #1a1a1c;
-  --surface: #222225;
+  --bg: #18181a;
+  --surface: #26262a;
+  --card-line: #6c6c72;
   --raised: #2a2a2e;
   --line: #3b3b40;
   --line-strong: #7b7a80;
@@ -70,7 +72,8 @@
 
 :root[data-theme='black'] {
   --bg: #000000;
-  --surface: #0e0e0f;
+  --surface: #141416;
+  --card-line: #5f5f65;
   --raised: #19191b;
   --line: #2c2c30;
   --line-strong: #706f75;

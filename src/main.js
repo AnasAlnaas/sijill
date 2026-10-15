@@ -9,6 +9,7 @@ import { mountApp, goTo, currentView, createNote, createVoiceNote } from './ui/a
 import { openEditor, closeEditor } from './ui/editor.js';
 import { back, closeAll } from './ui/layers.js';
 import { toast } from './ui/overlays.js';
+import { keepCaretVisible } from './ui/dom.js';
 import { lockNow, unlock, onPause, onResume } from './ui/lock.js';
 import { initReminders, collectEvents } from './services/reminders.js';
 import { autoBackup } from './services/backup.js';
@@ -96,6 +97,9 @@ function trackKeyboard() {
   const update = () => {
     const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
     document.documentElement.style.setProperty('--kb', `${kb > 80 ? kb : 0}px`);
+    // When the keyboard opens or closes, keep the line being typed in view.
+    const a = document.activeElement;
+    if (a?.tagName === 'TEXTAREA') requestAnimationFrame(() => keepCaretVisible(a));
   };
   vv.addEventListener('resize', update);
   vv.addEventListener('scroll', update);

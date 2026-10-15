@@ -70,6 +70,11 @@ export function onLaunchAction(fn) {
   if (isNative) System.addListener('launchAction', fn);
 }
 
+/** Status bar, navigation bar and window background in the theme's colour. */
+export async function setBarColors(color) {
+  if (isNative && color) await System.setBarColors({ color }).catch(() => {});
+}
+
 /** Long-press shortcuts on the app icon, labelled in the app's language. */
 export async function setShortcuts(items) {
   if (isNative) await System.setShortcuts({ items }).catch(() => {});

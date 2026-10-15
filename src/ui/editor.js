@@ -1,7 +1,7 @@
 // The note editor: a full-screen layer with the title, the text or checklist, images,
 // and a bottom bar of actions within thumb reach. Every keystroke is saved.
 
-import { h, fill, autoGrow, debounce } from './dom.js';
+import { h, fill, autoGrow, debounce, keepCaretVisible } from './dom.js';
 import { Checklist } from './checklist.js';
 import { NoteBody } from './notebody.js';
 import { DictationPanel } from './dictation.js';
@@ -61,6 +61,7 @@ class Editor {
       if (this.title.value.includes('\n')) this.title.value = this.title.value.replace(/\n/g, ' ');
       autoGrow(this.title);
       this.set({ title: this.title.value });
+      requestAnimationFrame(() => keepCaretVisible(this.title));
     });
     this.title.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.isComposing) {

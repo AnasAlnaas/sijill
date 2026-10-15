@@ -6,6 +6,7 @@ import { icon } from './icons.js';
 import { pushLayer } from './layers.js';
 import { menuSheet, promptDialog, confirmDialog } from './overlays.js';
 import { renderCard, onLongPress } from './cards.js';
+import { enableSwipe } from './swipe.js';
 import { openEditor, currentEditor } from './editor.js';
 import { markerSheet, labelsSheet } from './notesheets.js';
 import { openSettings } from './settings.js';
@@ -47,6 +48,22 @@ export function mountApp(container) {
     else openEditor(id);
   });
   onLongPress(mainEl, '.card[data-id]', (card) => toggleSelect(card.dataset.id));
+  enableSwipe(mainEl, {
+    enabled: () => !state.selection.size && state.view.kind !== 'trash',
+    actionFor: (id, side) => {
+      const n = store.get(id);
+      if (!n || n.trashedAt) return null;
+      if (side === 'start') return { key: 'trash', icon: 'trash', label: t('moveToTrash') };
+      return n.archived
+        ? { key: 'unarchive', icon: 'unarchive', label: t('unarchive') }
+        : { key: 'archive', icon: 'archive', label: t('doArchive') };
+    },
+    onAction: (id, key) => {
+      if (key === 'trash') actions.trashNotes([id]);
+      else if (key === 'unarchive') actions.unarchiveNotes([id]);
+      else actions.archiveNotes([id]);
+    },
+  });
 
   store.addEventListener('change', (e) => {
     const d = e.detail || {};
@@ -85,6 +102,9 @@ export function goTo(view) {
 export function currentView() {
   return state.view;
 }
+
+// Each card sits in a wrapper, so a swipe can show what it will do behind the card.
+const wrap = (card) => h('div', { class: 'card-wrap' }, card);
 
 // --- lists ----------------------------------------------------------------------------------------
 
@@ -143,7 +163,7 @@ function render() {
     const results = searchNotes(store.allNotes().filter((n) => !n.trashedAt), state.query, store.labelName);
     parts.push(h('div', { class: 'page-head' }, h('h1', { class: 'page-title' }, t('search'))));
     if (!results.length) parts.push(h('p', { class: 'empty' }, icon('search', { size: 32 }), h('br'), t('noResults', { q: state.query })));
-    else parts.push(h('div', { class: 'cards' }, results.map((n) => renderCard(n, { terms, selected: state.selection.has(n.id), showArchived: true }))));
+    else parts.push(h('div', { class: 'cards' }, results.map((n) => wrap(renderCard(n, { terms, selected: state.selection.has(n.id), showArchived: true })))));
   } else {
     const isHome = state.view.kind === 'notes';
     parts.push(h('div', { class: 'page-head' },
@@ -162,7 +182,7 @@ function render() {
       for (const [title, list] of groups) {
         if (!list.length) continue;
         if (title) parts.push(h('h2', { class: 'section-h' }, title === t('pinned') ? icon('pinFilled', { size: 16 }) : null, title));
-        parts.push(h('div', { class: 'cards' }, list.map((n) => renderCard(n, { selected: state.selection.has(n.id) }))));
+        parts.push(h('div', { class: 'cards' }, list.map((n) => wrap(renderCard(n, { selected: state.selection.has(n.id) })))));
       }
     }
   }

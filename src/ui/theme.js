@@ -3,7 +3,7 @@
 
 import { setLang, t } from '../i18n.js';
 import { SystemBars, SystemBarsStyle } from '@capacitor/core';
-import { setShortcuts, isNative } from '../native.js';
+import { setShortcuts, setBarColors, isNative } from '../native.js';
 import { setFormatPrefs } from '../core/format.js';
 
 let systemFontScale = 1;
@@ -43,6 +43,7 @@ export function applyAppearance(s) {
   }
   const meta = document.querySelector('meta[name="theme-color"]') || document.head.appendChild(Object.assign(document.createElement('meta'), { name: 'theme-color' }));
   meta.content = getComputedStyle(r).getPropertyValue('--bg').trim();
+  setBarColors(meta.content);
   try {
     localStorage.setItem('sijill.boot', JSON.stringify({ theme: s.theme, accent: s.accent, lang: s.lang, fontPx: px }));
   } catch { /* private mode */ }

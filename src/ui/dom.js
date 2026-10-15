@@ -38,10 +38,70 @@ export function fill(el, ...children) {
   return el;
 }
 
-/** Grow a textarea to fit its content (no inner scrollbars). */
+function scrollParent(el) {
+  for (let p = el.parentElement; p; p = p.parentElement) {
+    const oy = getComputedStyle(p).overflowY;
+    if ((oy === 'auto' || oy === 'scroll') && p.scrollHeight > p.clientHeight) return p;
+  }
+  return document.scrollingElement;
+}
+
+/**
+ * Grow a textarea to fit its content (no inner scrollbars).
+ * Measuring needs a moment at height:auto, which briefly shortens the page; the scroll
+ * position is put back so the view never jumps to the top while writing.
+ */
 export function autoGrow(ta) {
+  const sp = scrollParent(ta);
+  const top = sp?.scrollTop;
+  const before = ta.offsetHeight;
+  // Keep the page as tall as it was while measuring, so the browser has no reason to scroll.
+  const content = sp === document.scrollingElement ? document.body : sp?.firstElementChild;
+  const held = content?.style.minHeight;
+  if (content) content.style.minHeight = `${content.offsetHeight}px`;
   ta.style.height = 'auto';
-  ta.style.height = `${ta.scrollHeight}px`;
+  const h = ta.scrollHeight;
+  ta.style.height = `${h}px`;
+  if (content) content.style.minHeight = held || '';
+  if (sp && sp.scrollTop !== top) sp.scrollTop = top;
+  return h !== before;
+}
+
+// A hidden copy of the textarea, to find where the caret is (in pixels from the top).
+let mirror = null;
+function caretTop(ta) {
+  if (!mirror) {
+    mirror = document.createElement('div');
+    mirror.setAttribute('aria-hidden', 'true');
+    mirror.style.cssText = 'position:absolute;visibility:hidden;inset-block-start:0;inset-inline-start:-9999px;white-space:pre-wrap;overflow-wrap:break-word;';
+    document.body.append(mirror);
+  }
+  const cs = getComputedStyle(ta);
+  for (const p of ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'borderTopWidth', 'borderBottomWidth', 'boxSizing', 'direction', 'unicodeBidi', 'textAlign', 'tabSize']) {
+    mirror.style[p] = cs[p];
+  }
+  mirror.style.width = `${ta.clientWidth}px`;
+  mirror.textContent = ta.value.slice(0, ta.selectionEnd);
+  const marker = document.createElement('span');
+  marker.textContent = '​';
+  mirror.append(marker);
+  return { top: marker.offsetTop, height: parseFloat(cs.lineHeight) || 24 };
+}
+
+/**
+ * Keep the line being typed in view (above the keyboard and the bottom bar), scrolling
+ * only as much as needed.
+ */
+export function keepCaretVisible(ta, margin = 24) {
+  if (document.activeElement !== ta) return;
+  const sp = scrollParent(ta);
+  if (!sp) return;
+  const { top, height } = caretTop(ta);
+  const taRect = ta.getBoundingClientRect();
+  const spRect = sp === document.scrollingElement ? { top: 0, bottom: window.visualViewport?.height || innerHeight } : sp.getBoundingClientRect();
+  const caretY = taRect.top + top;
+  if (caretY + height + margin > spRect.bottom) sp.scrollTop += caretY + height + margin - spRect.bottom;
+  else if (caretY - margin < spRect.top) sp.scrollTop -= spRect.top - (caretY - margin);
 }
 
 export function debounce(fn, ms) {
