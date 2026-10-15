@@ -94,3 +94,21 @@ export function dateTime(ms, { now = Date.now(), words } = {}) {
 export function stamp(ms, now = Date.now()) {
   return sameDay(new Date(ms), new Date(now)) ? time(ms) : date(ms);
 }
+
+/** "جمادى الأولى ١٤٤٨ هـ" / "October 2026": a month in a given calendar (not the date setting). */
+export function monthLabel(ms, cal) {
+  const base = prefs.lang === 'ar' ? 'ar' : 'en-GB';
+  const key = `month|${cal}|${prefs.lang}|${prefs.numerals}`;
+  let f = cache.get(key);
+  if (!f) {
+    f = new Intl.DateTimeFormat(`${base}-u-nu-${prefs.numerals}-ca-${cal === 'hijri' ? 'islamic-umalqura' : 'gregory'}`, { month: 'long', year: 'numeric' });
+    cache.set(key, f);
+  }
+  return f.format(ms).replace(/\s+/g, ' ').trim();
+}
+
+/** A year heading: "٢٠٢٦" or "١٤٤٨ هـ". */
+export function yearLabel(year, cal) {
+  if (cal !== 'hijri') return num(year);
+  return prefs.lang === 'ar' ? `${num(year)} هـ` : `${num(year)} AH`;
+}

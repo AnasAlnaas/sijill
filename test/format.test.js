@@ -24,3 +24,15 @@ test('Gregorian, Hijri and both', () => {
   assert.match(both, /١٤٤٨/);
   assert.match(both, / · /);
 });
+
+test('month and year labels in either calendar', async () => {
+  const { monthLabel, yearLabel } = await import('../src/core/format.js');
+  setFormatPrefs({ lang: 'ar', numerals: 'arab', calendar: 'hijri' });
+  assert.match(monthLabel(oct14, 'hijri'), /جمادى الأولى/);
+  assert.match(monthLabel(oct14, 'hijri'), /١٤٤٨/);
+  assert.match(monthLabel(oct14, 'gregory'), /أكتوبر ٢٠٢٦/);
+  assert.equal(yearLabel(1448, 'hijri'), '١٤٤٨ هـ');
+  setFormatPrefs({ lang: 'en', numerals: 'latn' });
+  assert.equal(monthLabel(oct14, 'gregory'), 'October 2026');
+  assert.equal(yearLabel(2026, 'gregory'), '2026');
+});

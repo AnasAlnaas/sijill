@@ -98,3 +98,18 @@ export async function exportNotePdf(note) {
     toast(t('failed', { msg: e?.message || e }), { error: true });
   }
 }
+
+/** A whole journal year as one PDF: oldest month first, each month on its own page. */
+export async function exportJournalYear(notes, yearText) {
+  try {
+    const ordered = [...notes].sort((a, b) => (a.journal.year - b.journal.year) || (a.journal.month - b.journal.month));
+    const docs = await Promise.all(ordered.map((n) => noteHtml(n)));
+    if (!docs.length) return;
+    const head = docs[0].slice(0, docs[0].indexOf('<body>'))
+      .replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(`${t('journal')} ${yearText}`)}</title>`);
+    const bodies = docs.map((d, i) => `<section${i ? ' style="break-before: page"' : ''}>${d.slice(d.indexOf('<body>') + 6, d.lastIndexOf('</body>'))}</section>`);
+    await printHtml(`${head}<body>${bodies.join('\n')}</body></html>`, `${t('journal')} ${yearText}`.slice(0, 60));
+  } catch (e) {
+    toast(t('failed', { msg: e?.message || e }), { error: true });
+  }
+}

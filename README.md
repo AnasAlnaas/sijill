@@ -2,13 +2,13 @@
 
 A private notes app for Android, in Arabic and English. Everything lives on the phone; no account.
 
-**Current version: 0.2.2** → `release/Sijill-0.2.2.apk`
+**Current version: 0.3.0** → `release/Sijill-0.3.0.apk`
 
 ---
 
 ## Install on your phone (Redmi Note 11)
 
-1. Copy `release\Sijill-0.2.2.apk` to the phone (USB cable, Google Drive, Telegram "Saved messages", anything).
+1. Copy `release\Sijill-0.3.0.apk` to the phone (USB cable, Google Drive, Telegram "Saved messages", anything).
 2. On the phone, open the file (Files app → Downloads). If asked, allow **"Install unknown apps"** for the app you opened it from.
 3. MIUI may show a security scan or ask you to wait a few seconds; then tap **Install**.
 4. Open **سِجِلّ**. When you set your first reminder, allow notifications.
@@ -41,6 +41,10 @@ In a note, ⋮ → **Delete after a month**. A month later the note moves to Tra
 ### Swipe a card
 
 On the main screen, swipe a card toward the end of the reading line to **archive** it (left in Arabic, right in English), or toward the start to move it to **Trash**. What will happen is written behind the card while you drag; let go early to cancel. Every swipe offers Undo.
+
+### Monthly journal
+
+Menu → **اليوميات / Journal**. The big button opens this month's entry (one note per month), creating it the first time; the **+** and microphone buttons on that screen do the same. Months follow your calendar setting (Hijri or Gregorian; "both" counts in Gregorian). Past months are listed by year, and each year can be exported as one PDF. Turn on the **monthly reminder** there to be nudged on a chosen day of each month. Journal entries stay out of the main Notes list; search still finds them.
 
 ## Update to a newer version
 

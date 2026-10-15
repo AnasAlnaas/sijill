@@ -7,11 +7,12 @@ import { isNative, deviceInfo, takeLaunchAction, onLaunchAction, setSecureScreen
 import { applyAppearance, setSystemFontScale, onSystemThemeChange } from './ui/theme.js';
 import { mountApp, goTo, currentView, createNote, createVoiceNote } from './ui/app.js';
 import { openEditor, closeEditor } from './ui/editor.js';
+import { openJournalEntry } from './ui/journal.js';
 import { back, closeAll } from './ui/layers.js';
 import { toast } from './ui/overlays.js';
 import { keepCaretVisible } from './ui/dom.js';
 import { lockNow, unlock, onPause, onResume } from './ui/lock.js';
-import { initReminders, collectEvents } from './services/reminders.js';
+import { initReminders, collectEvents, sync as syncReminders } from './services/reminders.js';
 import { autoBackup } from './services/backup.js';
 import { t } from './i18n.js';
 
@@ -57,6 +58,7 @@ async function boot() {
     App.addListener('resume', () => {
       onResume(store.settings);
       collectEvents();
+      syncReminders(); // keeps the monthly journal reminder's next dates topped up
       store.purgeOldTrash();
       setTimeout(() => autoBackup(store).catch(() => {}), 2500);
     });
@@ -76,7 +78,13 @@ async function boot() {
 /** Shortcuts on the app icon, and taps on reminder notifications. */
 function handleLaunch(a) {
   if (!a?.action) return;
-  if (a.action === 'openNote' && a.noteId && store.get(a.noteId)) {
+  if (a.action === 'openNote' && String(a.noteId || '').startsWith('journal:')) {
+    // The monthly journal reminder: open this month's entry.
+    closeEditor();
+    closeAll();
+    goTo({ kind: 'journal' });
+    openJournalEntry();
+  } else if (a.action === 'openNote' && a.noteId && store.get(a.noteId)) {
     closeAll();
     openEditor(a.noteId);
   } else if (a.action === 'voiceNote') {

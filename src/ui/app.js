@@ -7,6 +7,7 @@ import { pushLayer } from './layers.js';
 import { menuSheet, promptDialog, confirmDialog } from './overlays.js';
 import { renderCard, onLongPress } from './cards.js';
 import { enableSwipe } from './swipe.js';
+import { journalView, openJournalEntry } from './journal.js';
 import { openEditor, currentEditor } from './editor.js';
 import { markerSheet, labelsSheet } from './notesheets.js';
 import { openSettings } from './settings.js';
@@ -67,7 +68,8 @@ export function mountApp(container) {
 
   store.addEventListener('change', (e) => {
     const d = e.detail || {};
-    if (d.settings && !d.notes && !d.labels) return;
+    // Settings only matter here when they change what the Journal shows.
+    if (d.settings && !d.notes && !d.labels && !d.settings.some((k) => k === 'journalReminder' || k === 'calendar')) return;
     if (d.deleted) for (const id of d.notes || []) state.selection.delete(id);
     scheduleRender();
   });
@@ -126,10 +128,11 @@ function viewNotes() {
       return { groups: [[past.length ? t('upcoming') : null, upcoming], [t('past'), past]] };
     }
     case 'label': {
-      const list = all.filter((n) => !n.trashedAt && !n.archived && n.labels.includes(v.id));
+      const list = all.filter((n) => !n.trashedAt && !n.archived && !n.journal && n.labels.includes(v.id));
       return pinnedGroups(list);
     }
-    default: return pinnedGroups(all.filter((n) => !n.trashedAt && !n.archived));
+    // Journal entries live in the Journal, not among everyday notes (search still finds them).
+    default: return pinnedGroups(all.filter((n) => !n.trashedAt && !n.archived && !n.journal));
   }
 }
 
@@ -174,6 +177,12 @@ function render() {
       state.view.kind === 'trash' && store.allNotes().some((n) => n.trashedAt)
         ? h('button', { class: 'btn quiet', onclick: () => actions.emptyTrash() }, t('emptyTrashNow')) : null));
     if (state.view.kind === 'trash') parts.push(h('p', { class: 'page-note' }, t('trashNote')));
+    if (state.view.kind === 'journal') {
+      parts.push(...journalView());
+      fill(mainEl, parts);
+      renderBar();
+      return;
+    }
     const { groups } = viewNotes();
     const total = groups.reduce((s, [, list]) => s + list.length, 0);
     if (!total) {
@@ -211,7 +220,7 @@ function renderBar() {
   normalBar.pill.hidden = !s;
   normalBar.menu.hidden = s;
   normalBar.find.hidden = s;
-  normalBar.list.hidden = s || trash;
+  normalBar.list.hidden = s || trash || state.view.kind === 'journal';
   normalBar.add.hidden = s || trash;
   normalBar.mic.hidden = s || trash;
 }
@@ -266,12 +275,14 @@ function endSearch() {
 
 /** The quickest way in: a new note that starts listening straight away. */
 export function createVoiceNote() {
+  if (state.view.kind === 'journal') return openJournalEntry({ dictate: true });
   const n = createNote('note', {}, { focus: null });
   currentEditor()?.startDictation();
   return n;
 }
 
 export function createNote(type, fields = {}, { focus } = {}) {
+  if (state.view.kind === 'journal' && type === 'note' && !fields.journal) return openJournalEntry();
   if (state.searching) endSearch();
   const v = state.view;
   const base = { type, ...fields };
@@ -291,6 +302,7 @@ function openMenu() {
   menuSheet(null, [
     { icon: 'note', label: t('notes'), current: v.kind === 'notes', onClick: () => goTo({ kind: 'notes' }) },
     { icon: 'bell', label: t('reminders'), current: v.kind === 'reminders', onClick: () => goTo({ kind: 'reminders' }) },
+    { icon: 'book', label: t('journal'), current: v.kind === 'journal', onClick: () => goTo({ kind: 'journal' }) },
     ...(labels.length ? ['sep'] : []),
     ...labels.map((l) => ({ icon: 'label', label: l.name, current: v.kind === 'label' && v.id === l.id, onClick: () => goTo({ kind: 'label', id: l.id }) })),
     { icon: 'edit', label: t('editLabels'), onClick: editLabels },

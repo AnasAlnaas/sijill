@@ -11,6 +11,7 @@ const P = {
   checklistAdd: '<path d="m3.5 6.5 2 2 3.5-3.5M12 7.5h8M3.5 14.5h6M17.5 12v8M13.5 16h8"/>',
   mic: '<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5v3"/>',
   stop: '<rect x="6.5" y="6.5" width="11" height="11" rx="1.5" fill="currentColor"/>',
+  book: '<path d="M4 5.5c2.5-1.3 5.5-1.3 8 .5 2.5-1.8 5.5-1.8 8-.5v13c-2.5-1.3-5.5-1.3-8 .5-2.5-1.8-5.5-1.8-8-.5zM12 6v13"/>',
   hourglass: '<path d="M7 3.5h10M7 20.5h10M8 3.5c0 4.5 8 4.5 8 8.5s-8 4-8 8.5M16 3.5c0 4.5-8 4.5-8 8.5s8 4 8 8.5"/>',
   back: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
   forward: '<path d="M5 12h14M13 6l6 6-6 6"/>',

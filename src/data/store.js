@@ -26,6 +26,7 @@ export const DEFAULT_SETTINGS = {
   lockAfter: 60, // seconds in the background before the lock comes back
   secureScreen: true,
   snoozeMinutes: 30,
+  journalReminder: null, // { on, day (1–28), time 'HH:MM' } in the reader's calendar
   checkedCollapsed: false,
   backupFolder: null,
   lastBackupAt: 0,

@@ -56,7 +56,8 @@ export function newLabel(name, fields = {}) {
 }
 
 export function isEmptyNote(n) {
-  return !(n.title && n.title.trim()) && !(n.body && n.body.trim())
+  // A journal entry's title is filled in automatically, so it doesn't count as writing.
+  return (n.journal || !(n.title && n.title.trim())) && !(n.body && n.body.trim())
     && !(n.items || []).some((i) => i.text.trim()) && !(n.attachments || []).length && !n.reminder;
 }
 

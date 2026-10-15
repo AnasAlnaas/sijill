@@ -120,3 +120,14 @@ test('"delete after a month" moves the note to Trash when the time comes', async
   s.purgeOldTrash(now + 31 * 86400000);
   assert.equal(s.get(due.id), null);
 });
+
+test('an untouched journal entry is discarded like an empty note', async () => {
+  const s = new Store(new MemoryDb());
+  await s.init();
+  const j = s.createNote({ title: 'يوميات جمادى الأولى ١٤٤٨ هـ', journal: { cal: 'hijri', year: 1448, month: 5 } });
+  s.beginSession(j.id);
+  assert.deepEqual(s.endSession(j.id), { discarded: true });
+  const k = s.createNote({ title: 'يوميات', body: 'كتبت شيئًا', journal: { cal: 'hijri', year: 1448, month: 5 } });
+  s.beginSession(k.id);
+  assert.deepEqual(s.endSession(k.id), { discarded: false });
+});

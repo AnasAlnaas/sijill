@@ -5,6 +5,8 @@ import { reminders as native } from '../native.js';
 import { nextAlert, repeatOf } from '../core/recurrence.js';
 import { displayTitle, noteToPlainText } from '../core/model.js';
 import { t } from '../i18n.js';
+import { journalCalendar, monthlyOccurrences } from '../core/journal.js';
+import { monthLabel } from '../core/format.js';
 
 let store;
 let timer = null;
@@ -14,7 +16,8 @@ export function initReminders(s) {
   store = s;
   store.addEventListener('change', (e) => {
     const d = e.detail || {};
-    if (d.notes || d.settings?.includes('lang') || d.settings?.includes('snoozeMinutes')) schedule();
+    const keys = ['lang', 'snoozeMinutes', 'journalReminder', 'calendar'];
+    if (d.notes || d.settings?.some((k) => keys.includes(k))) schedule();
   });
   native.onEvent((ev) => applyEvents([ev]));
   schedule(0);
@@ -38,6 +41,16 @@ export async function sync() {
     if (!n.title.trim()) body = body.split('\n').slice(1).join('\n').trim();
     body = body.slice(0, 240);
     items.push({ id: n.id, at, start: n.reminder.at, repeat: repeatOf(n.reminder), title: displayTitle(n) || t('appName'), body });
+  }
+  // The monthly journal reminder: the next 12 dates in the reader's calendar, each its own
+  // alarm (Hijri months can't be repeated by the phone's Gregorian alarm clock). The list is
+  // refreshed every time the app opens, so it never runs out.
+  const jr = store.settings.journalReminder;
+  if (jr?.on) {
+    const c = journalCalendar(store.settings.calendar);
+    monthlyOccurrences(jr, c, now, 12).forEach((at, i) => {
+      items.push({ id: `journal:${i}`, at, start: at, repeat: 'none', title: t('journalNotifTitle', { month: monthLabel(at, c) }), body: t('journalNotifBody') });
+    });
   }
   const strings = { snooze: t('notifSnooze'), done: t('notifDone'), channel: t('reminders'), snoozeMinutes: store.settings.snoozeMinutes };
   const sig = JSON.stringify([items, strings]);
